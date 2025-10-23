@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ro">
+    <head>
+        <title>{{titlu_tab}}</title>
+    </head>
+    <body>
+        <h1>{{titlu_articol}}</h1>
+        <link rel="stylesheet" href="{% static 'Cofetarie/CSS/stil.css' %}" type="text/css">
+        <p>{{continut_articol}}</p>
+        {# un comentariu de o linie#}
+        {% url 'info'%}
+        <a href="{% url 'info'%}?a=10&b=20">Link catre info</a>
+        <img src="{% static 'Cofetarie/imagini/tort.png' %}" alt="Logo">
+
+    </body>
+</html>
