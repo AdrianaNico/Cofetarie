@@ -5,6 +5,8 @@ from django.db.models import Count
 from django.http import HttpResponse
 from datetime import datetime
 
+from .models import Tort, Optinuni_decoratiune, Optiuni_blat, Optiuni_crema, Prajitura
+
 
 def index(request):
 	return HttpResponse(f"""
