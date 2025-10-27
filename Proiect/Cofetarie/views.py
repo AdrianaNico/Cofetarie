@@ -225,3 +225,42 @@ def afis_produse(request):
             "nr_locatii": len(locatii),
         }
     )
+    
+    
+# -------------cofetarie
+
+def pagina_principala(request):
+    ip = request.META.get('REMOTE_ADDR')
+    context = {'user_ip': ip}
+    return render(request, 'Cofetarie/pagina_principala.html', context)
+
+def pagina_despre(request):
+    ip = request.META.get('REMOTE_ADDR')
+    context = {'user_ip': ip}
+    return render(request, 'Cofetarie/despre.html', context)
+
+# --in lucru
+def pagina_produse(request):
+    ip = request.META.get('REMOTE_ADDR')
+    context = {'user_ip': ip}
+    return render(request, 'Cofetarie/in_lucru.html', context)
+
+def pagina_contact(request):
+    ip = request.META.get('REMOTE_ADDR')
+    context = {'user_ip': ip}
+    return render(request, 'Cofetarie/in_lucru.html', context)
+
+def pagina_cos_virtual(request):
+    ip = request.META.get('REMOTE_ADDR')
+    context = {'user_ip': ip}
+    return render(request, 'Cofetarie/in_lucru.html', context)
+
+def pagina_log(request):
+    ip = request.META.get('REMOTE_ADDR')
+    context = {'user_ip': ip}
+    return render(request, 'Cofetarie/in_lucru.html', context)
+
+def pagina_info(request):
+    ip = request.META.get('REMOTE_ADDR')
+    context = {'user_ip': ip}
+    return render(request, 'Cofetarie/in_lucru.html', context)

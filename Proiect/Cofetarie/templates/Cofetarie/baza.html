@@ -7,14 +7,41 @@
     
     <title>{% block title %}Cofetaria{% endblock %}</title>
     
-    <link rel="stylesheet" href="{% static 'CSS/stil.css' %}">
+    <link rel="stylesheet" href="{% static 'Cofetarie/CSS/stil.css' %}">
 </head>
 <body>
 
     <header>
-        <h1>Cofetaria Dulce</h1>
-        <nav>
-            <p>(Zonă Meniu)</p>
+        <h1>Cofetaria NicoSweet</h1>
+        
+        <nav class="meniu-principal">
+            <ul>
+                <li class="dropdown">
+                    <a href="{% url 'acasa' %}" class="dropbtn">Acasă</a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'acasa' %}#bun-venit">Bun Venit</a>
+                        <a href="{% url 'acasa' %}#noutati">Noutăți</a>
+                        <a href="{% url 'acasa' %}#recomandari">Recomandări</a>
+                        <a href="{% url 'acasa' %}#evenimente">Evenimente</a>
+                        <a href="{% url 'acasa' %}#promotii">Promoții</a>
+                    </div>
+                </li>
+                
+                <li class="dropdown">
+                    <a href="{% url 'despre' %}" class="dropbtn">Despre</a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'despre' %}#povestea">Povestea Noastră</a>
+                        <a href="{% url 'despre' %}#echipa">Echipa</a>
+                    </div>
+                </li>
+                
+                <li><a href="{% url 'produse' %}">Produse</a></li>
+                <li><a href="{% url 'contact' %}">Contact</a></li>
+                <li><a href="{% url 'cos_virtual' %}">Coș</a></li>
+                
+                <li><a href="{% url 'log' %}">Log</a></li>
+                <li><a href="{% url 'info' %}">Info</a></li>
+            </ul>
         </nav>
     </header>
 
@@ -24,7 +51,8 @@
     </main>
 
     <footer>
-        <p>(Zonă Footer)</p>
+        <p>Proiect realizat de Gună Adriana Nicoleta</p>
+        <p>Adresa ta IP este: <strong>{{ user_ip }}</strong></p>
         </footer>
 
 </body>

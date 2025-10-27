@@ -191,3 +191,9 @@ class Prajitura(models.Model):
         verbose_name_plural = "Prajituri"
     
     # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!de pus poze la praji
+    
+    
+    
+    
+    
+    

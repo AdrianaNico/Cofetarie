@@ -1,0 +1,18 @@
+{% extends 'Cofetarie/baza.html' %}
+{% load static %}
+
+{% block title %}Despre Noi{% endblock %}
+
+{% block content %}
+    <section id="povestea">
+        <h2>Povestea Noastră</h2>
+        <p>Am pornit din pasiune pentru gustul autentic și am creat un loc unde fiecare prăjitură spune o poveste. Folosim doar ingrediente naturale și rețete inedite.</p>
+    </section>
+
+    <section id="echipa">
+        <h2>Echipa</h2>
+        <p>Maeștrii noștri cofetari sunt dedicați excelenței.</p>
+        
+        <img src="{% static 'Cofetarie/imagini/locatie_cofetarie.jpg' %}" alt="Locația cofetăriei" style="width:300px;">
+    </section>
+{% endblock %}

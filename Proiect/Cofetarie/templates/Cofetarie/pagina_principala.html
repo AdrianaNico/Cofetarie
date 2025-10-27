@@ -1,0 +1,34 @@
+{% extends 'Cofetarie/baza.html' %}
+{% load static %}
+
+{% block title %}Acasă - Cofetaria NicoSweet{% endblock %}
+
+{% block content %}
+    <section id="bun-venit">
+        <h2>Bun venit la Cofetaria NicoSweet!</h2>
+        <p>Locul unde deserturile prind viață.</p>
+        
+        <img src="{% static 'Cofetarie/imagini/prajitura_casei.jpg' %}" alt="Prajitura casei" style="width:300px;">
+    </section>
+
+    <section id="noutati">
+        <h2>Noutăți</h2>
+        <p>Cele mai noi deserturi.</p>
+    </section>
+    
+    <section id="recomandari">
+        <h2>Recomandări</h2>
+        <p>Încearcă faimoasa tartă de ciocolată!</p>
+    </section>
+
+    <section id="evenimente">
+        <h2>Evenimente Speciale</h2>
+        <p>Organizăm candy-bar pentru nunți și botezuri.</p>
+    </section>
+
+    <section id="promotii">
+        <h2>Promoția Săptămânii</h2>
+        <p>La orice tort comandat, primești o cutie de macarons gratuit!</p>
+    </section>
+
+{% endblock %}
