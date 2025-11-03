@@ -10,26 +10,36 @@ admin.site.index_title = "Bine ai venit în panoul de administrare"
 # admin.site.register(Organizator)
 # admin.site.register(Locatie)
 
-# class LocatieAdmin(admin.ModelAdmin):
-#     list_display = ('oras', 'judet')  # afișează câmpurile în lista de obiecte
-#     list_filter = ('oras', 'judet')  # adaugă filtre laterale
-#     search_fields = ('oras', )  # permite căutarea după anumite câmpuri
-#         # punem virgula ca sa il vada ca un tuplu
+class OptiuniBlatAdmin(admin.ModelAdmin):
+    list_display = ('nume_blat', 'calorii','pret',)  # afișează câmpurile în lista de obiecte
+    list_filter = ('nume_blat', 'pret')  # adaugă filtre laterale
+    search_fields = ('nume_blat', 'pret', )  # permite căutarea după anumite câmpuri
+    ordering = ['nume_blat', '-pret']
+        # punem virgula ca sa il vada ca un tuplu
+    list_per_page = 5 #nr de obiecte afisate pe pagina/ PAGINATOR
     
-#     fieldsets = (
-#     ('Date Generale', {
-#         'fields': ('oras', 'judet')
-#     }),
-#     ('Date Specifice', {
-#         'fields': ('adresa','cod_postal'),
-#         'classes': ('collapse',),  # secțiune pliabilă
-#     }),
-# )
+admin.site.register(Optiuni_blat, OptiuniBlatAdmin)
 
-# admin.site.register(Locatie, LocatieAdmin)
+class TortAdmin(admin.ModelAdmin):
+    list_display = ('nume_personalizat', 'pret_calculat', 'blat', 'crema', 'data_comanda')
+    search_fields = ('nume_personalizat', 'descriere_tort') 
+    ordering = ('-data_comanda',) 
+    list_per_page = 5 
+    fieldsets = (
+        ('Detalii Esențiale', {
+            'fields': ('nume_personalizat', 'gramaj', 'blat', 'crema', 'ingrediente')
+        }),
+        ('Opțiuni Suplimentare', {
+            'fields': ('descriere_tort',),
+            'classes': ('collapse',),
+        }),
+    )
 
-admin.site.register(Tort)
-admin.site.register(Optiuni_blat)
+admin.site.register(Tort, TortAdmin)
+
+
+# admin.site.register(Tort)
+# admin.site.register(Optiuni_blat)
 admin.site.register(Optiuni_crema)
 admin.site.register(Optinuni_decoratiune)
 admin.site.register(Ingrediente)

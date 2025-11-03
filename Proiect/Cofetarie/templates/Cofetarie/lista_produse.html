@@ -1,0 +1,51 @@
+{% extends 'Cofetarie/baza.html' %}
+
+{% block title %}Lista Produse{% endblock %}
+
+{% block content %}
+    <header>
+        <h1>{{ titlu_pagina }}</h1>
+
+        {% if page_obj.paginator.count > 0 %}
+            <p>Afișăm {{ page_obj.end_index }} din totalul de {{ page_obj.paginator.count }} produse.</p>
+        {% else %}
+            <p>Nu exista produse momentan.</p>
+        {% endif %}
+    </header>
+
+    <main class="lista-produse">
+        {% if page_obj.object_list %}
+            {% for prajitura in page_obj.object_list %}
+                <article class="produs">
+                    <h2>{{ prajitura.nume_prajitura }}</h2>
+                    <ul>
+                        <li><strong>Categorie:</strong> {{ prajitura.get_categorie_display }}</li>
+                        <li><strong>Preț:</strong> {{ prajitura.pret }} RON</li>
+                        <li><strong>Gramaj:</strong> {{ prajitura.gramaj }} grame</li>
+                    </ul>
+                </article>
+                <hr>
+            {% endfor %}
+        {% else %}
+            <p>Nu exista produse momentan.</p>
+        {% endif %}
+    </main>
+
+    <nav class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">« Prima</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Precedentă</a>
+            {% endif %}
+
+            <span class="current-page">
+                Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Următoare</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Ultima »</a>
+            {% endif %}
+        </span>
+    </nav>
+{% endblock %}

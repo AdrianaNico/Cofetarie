@@ -1,9 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Accesare
 from .models import Locatie
 from django.db.models import Count
 from django.http import HttpResponse
 from datetime import datetime
+from .forms import ContactForm
+from django.core.paginator import Paginator
 
 from .models import Tort, Optinuni_decoratiune, Optiuni_blat, Optiuni_crema, Prajitura
 
@@ -18,14 +20,14 @@ def index(request):
         """)
 #http://127.0.0.1:8000/Cofetarie?mesaj=Bun venit!&a=1&a=20&a=30
 
-def info(request):
-	return HttpResponse(f"""
-        <html>
-        <h1>Informatii despre server</h1>
-        <p>{request.GET.get("data")}</p>
-        <p>{int(request.GET.getlist("a")[-1])}</p>
-        </html>
-        """)
+# def info(request):
+# 	return HttpResponse(f"""
+#         <html>
+#         <h1>Informatii despre server</h1>
+#         <p>{request.GET.get("data")}</p>
+#         <p>{int(request.GET.getlist("a")[-1])}</p>
+#         </html>
+#         """)
 #http://127.0.0.1:8000/Cofetarie/info?data=Salut&a=1&a=20&a=30
 
 def cum_il_cheama(request):
@@ -71,7 +73,67 @@ def afis_template(request):
     )
 
 
-def log_view(request):
+def afis_produse(request):
+    # facem acum pt locatie, dar trb modificat pt produsele mele
+    locatii= Locatie.objects.all()
+    return render(request, "Cofetarie/locatii.html", 
+        {
+            "locatii": locatii,
+            "nr_locatii": len(locatii),
+        }
+    )
+    
+    
+# -------------cofetarie
+
+def pagina_principala(request):
+    return render(request, 'Cofetarie/pagina_principala.html')
+
+def pagina_despre(request):
+    return render(request, 'Cofetarie/despre.html')
+
+# --in lucru
+def pagina_produse(request):
+    toate_prajiturile = Prajitura.objects.all()
+    paginator = Paginator(toate_prajiturile, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'titlu_pagina': 'Lista prajituri disponibile'
+    }
+    return render(request, 'Cofetarie/lista_produse.html', context)
+
+
+def pagina_contact(request):
+    return render(request, 'Cofetarie/in_lucru.html')
+
+def pagina_cos_virtual(request):
+    return render(request, 'Cofetarie/in_lucru.html')
+
+
+def pagina_info(request):
+    
+    ip = request.META.get('REMOTE_ADDR')
+    data_param = request.GET.get("data", "N/A")
+    a_list = request.GET.getlist("a")
+    a_param = "N/A"
+    
+    if a_list:
+        try:
+            a_param = int(a_list[-1])
+        except (ValueError, IndexError):
+            a_param = f"Valoare invalidă ('{a_list[-1]}')"
+    
+    context = {
+        'user_ip': ip,
+        'data_param': data_param,
+        'a_param': a_param
+    }
+    return render(request, 'Cofetarie/info.html', context)
+
+def pagina_log(request):
     
     ultimele= request.GET.get("ultimele", None)
     accesari_param = request.GET.get("accesari", None)
@@ -110,7 +172,7 @@ def log_view(request):
         for id in iduri_brute:
             iduri_procesate.extend(id.split(','))
     
-        # Filtrăm dublurile dacă este necesar
+        # filtram dublurile
         if not dubluri:
             for id_str in iduri_procesate:
                 if id_str not in iduri_vazute:
@@ -122,7 +184,7 @@ def log_view(request):
         
         try:
             iduri_int = [int(id_str.strip()) for id_str in lista_iduri_finale]
-            # Mai întâi, luăm toate obiectele din BD într-un dicționar.
+            # luam obiectele din bd
             accesari_gasite = {acc.id: acc for acc in Accesare.objects.filter(id__in=iduri_int)}
             accesari = list(accesari_gasite.values())
         
@@ -181,11 +243,11 @@ def log_view(request):
             
             text_final += "</table>"
 
-        else:
-            text_final += "<ul>"
-            for acc in accesari:
-                text_final += f"<li>ID: {acc.id}, Data: {acc.data_accesare}, IP: {acc.ip_client}, URL: {acc.url_text}</li>"
-            text_final += "</ul>"
+        # else:
+        #     text_final += "<ul>"
+        #     for acc in accesari:
+        #         text_final += f"<li>ID: {acc.id}, Data: {acc.data_accesare}, IP: {acc.ip_client}, URL: {acc.url_text}</li>"
+        #     text_final += "</ul>"
             
     elif not mesaj_eroare:
         text_final += "<p>Nu există accesări de afișat conform filtrelor aplicate.</p>"
@@ -214,53 +276,48 @@ def log_view(request):
     else:
         text_final += "<p>Nu exista accesari inregistrate.</p>"    
     
-    return HttpResponse(text_final)
-
-def afis_produse(request):
-    # facem acum pt locatie, dar trb modificat pt produsele mele
-    locatii= Locatie.objects.all()
-    return render(request, "Cofetarie/locatii.html", 
-        {
-            "locatii": locatii,
-            "nr_locatii": len(locatii),
-        }
-    )
-    
-    
-# -------------cofetarie
-
-def pagina_principala(request):
     ip = request.META.get('REMOTE_ADDR')
-    context = {'user_ip': ip}
-    return render(request, 'Cofetarie/pagina_principala.html', context)
+    context['user_ip'] = ip
+    context['log_data_html'] = text_final
 
-def pagina_despre(request):
-    ip = request.META.get('REMOTE_ADDR')
-    context = {'user_ip': ip}
-    return render(request, 'Cofetarie/despre.html', context)
+    return render(request, 'Cofetarie/log.html', context)
 
-# --in lucru
-def pagina_produse(request):
-    ip = request.META.get('REMOTE_ADDR')
-    context = {'user_ip': ip}
-    return render(request, 'Cofetarie/in_lucru.html', context)
 
-def pagina_contact(request):
-    ip = request.META.get('REMOTE_ADDR')
-    context = {'user_ip': ip}
-    return render(request, 'Cofetarie/in_lucru.html', context)
 
-def pagina_cos_virtual(request):
-    ip = request.META.get('REMOTE_ADDR')
-    context = {'user_ip': ip}
-    return render(request, 'Cofetarie/in_lucru.html', context)
+from .forms import ContactForm
 
-def pagina_log(request):
-    ip = request.META.get('REMOTE_ADDR')
-    context = {'user_ip': ip}
-    return render(request, 'Cofetarie/in_lucru.html', context)
+def contact_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():  
+            nume = form.cleaned_data['nume'] #dictionar
+            email = form.cleaned_data['email']
+            mesaj = form.cleaned_data['mesaj']
+            # procesarea datelor
+            
+            return redirect('mesaj_trimis')
+    else:
+        form = ContactForm()
+    return render(request, 'aplicatie_exemplu/contact.html', {'form': form})
 
-def pagina_info(request):
-    ip = request.META.get('REMOTE_ADDR')
-    context = {'user_ip': ip}
-    return render(request, 'Cofetarie/in_lucru.html', context)
+
+# ----formular
+def contact_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():  
+            nume = form.cleaned_data['nume']
+            email = form.cleaned_data['email']
+            mesaj = form.cleaned_data['mesaj']
+            return redirect('mesaj_trimis')
+    else:
+        form = ContactForm()
+    return render(request, 'aplicatie_exemplu/contact.html', {'form': form})
+
+
+def clean(self):
+    cleaned_data = super().clean()
+    email = cleaned_data.get("email")
+    confirm_email = cleaned_data.get("confirm_email")
+    if email and confirm_email and email != confirm_email:
+        raise forms.ValidationError("Adresele de email nu coincid.")

@@ -1,0 +1,11 @@
+{% extends 'Cofetarie/baza.html' %}
+{% load static %}
+
+
+{% block content %}
+    <div style="padding: 20px;">
+        {{ log_data_html|safe }}
+
+        <h1>Informatii despre server</h1>
+    </div>
+{% endblock %}
