@@ -183,6 +183,7 @@ class Prajitura(models.Model):
     
     ingrediente = models. ManyToManyField("Ingrediente")
     
+    imagine = models.ImageField(upload_to='media/prajituri', null=True, blank=True)
     def __str__(self):
         return self.nume_prajitura
     

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Accesare
 from .models import Locatie
 from django.db.models import Count
@@ -283,6 +283,16 @@ def pagina_log(request):
     return render(request, 'Cofetarie/log.html', context)
 
 
+# detalii prajitura
+
+def detalii_prajitura(request, id_prajitura):
+    prajitura = get_object_or_404(Prajitura, pk = id_prajitura)
+    context ={
+        'prajitura': prajitura,
+        'titlu_pagina': f"Detalii {prajitura.nume_prajitura}",
+    }
+
+    return render(request, 'Cofetarie/detalii_prajitura.html', context)
 
 from .forms import ContactForm
 

@@ -17,7 +17,11 @@
         {% if page_obj.object_list %}
             {% for prajitura in page_obj.object_list %}
                 <article class="produs">
-                    <h2>{{ prajitura.nume_prajitura }}</h2>
+                    <h2>
+                    <a href="{% url 'detalii_prajitura' id_prajitura=prajitura.id %}">
+                        {{ prajitura.nume_prajitura }}
+                    </a>
+                </h2>
                     <ul>
                         <li><strong>Categorie:</strong> {{ prajitura.get_categorie_display }}</li>
                         <li><strong>Preț:</strong> {{ prajitura.pret }} RON</li>

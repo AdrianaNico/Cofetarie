@@ -17,6 +17,6 @@ urlpatterns = [
     path('cos/', views.pagina_cos_virtual, name='cos_virtual'),
     path('log/', views.pagina_log, name='log'),
     path('info/', views.pagina_info, name='info'),
-    
+    path('produse/<int:id_prajitura>/', views.detalii_prajitura, name='detalii_prajitura'),
 ]
 #data= cum se scrie in adresa, view si name este numele functiei din views

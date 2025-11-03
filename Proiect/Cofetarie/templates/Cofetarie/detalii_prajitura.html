@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titlu_pagina }}</title>
+</head>
+<body>
+
+    <h1>{{ prajitura.nume_prajitura }}</h1>
+    
+    <h2>Detalii Complete</h2>
+    
+    <p><strong>Descriere:</strong> {{ prajitura.descriere_prajitura|default:"Nu există descriere." }}</p>
+    {% if prajitura.imagine %}
+    <img src="{{ prajitura.imagine.url }}" alt="{{ prajitura.nume_prajitura }}" style="max-width: 400px;">
+        {% else %}
+            <p>Imagine indisponibilă.</p>
+        {% endif %}
+    <ul>
+        <li><strong>Categorie:</strong> {{ prajitura.get_categorie_display }}</li>
+        <li><strong>Preț:</strong> {{ prajitura.pret }} RON</li>
+        <li><strong>Gramaj:</strong> {{ prajitura.gramaj }} grame</li>
+    </ul>
+
+    <h3>Ingrediente:</h3>
+    {% if prajitura.ingrediente.all %}
+        <ul>
+            {% for ingredient in prajitura.ingrediente.all %}
+                <li>{{ ingredient.nume_ingredient }}{% if ingredient.este_alergen %}❗ Alergen{% endif %}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nu sunt specificate ingrediente.</p>
+    {% endif %}
+
+</body>
+</html>
