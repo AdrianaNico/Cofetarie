@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Accesare
 from .models import Locatie
+from .models import Prajitura
 from django.db.models import Count
 from django.http import HttpResponse
 from datetime import datetime
@@ -35,6 +36,10 @@ def cum_il_cheama(request):
     lista_nume= ("si "+" si ".join(lista_nume)) if lista_nume else "anonim"
     return HttpResponse(f"Pe coleg îl cheama {lista_nume}")
 #http://localhost:8000/aplicatie_exemplu/cum_il_cheama_pe_coleg/?nume=ionel&nume=gigel&nume=costel
+
+def get_context_categorii(context_base={}):
+    context_base['lista_categorii'] = Prajitura.CategoriePrajitura.choices
+    return context_base 
 
 
 def afis_data(request):
@@ -87,30 +92,48 @@ def afis_produse(request):
 # -------------cofetarie
 
 def pagina_principala(request):
-    return render(request, 'Cofetarie/pagina_principala.html')
+    context = get_context_categorii()
+    return render(request, 'Cofetarie/pagina_principala.html', context)
 
 def pagina_despre(request):
-    return render(request, 'Cofetarie/despre.html')
+    context = get_context_categorii()
+    return render(request, 'Cofetarie/despre.html', context)
 
-# --in lucru
+
 def pagina_produse(request):
+    sort_param = request.GET.get('sort', None)
     toate_prajiturile = Prajitura.objects.all()
+    
+#sortare
+    if sort_param == 'a':
+        toate_prajiturile = toate_prajiturile.order_by('pret')
+    elif sort_param =='d':
+        toate_prajiturile = toate_prajiturile.order_by('-pret')
+    else:
+        toate_prajiturile = toate_prajiturile.order_by('nume_prajitura')    
+    
     paginator = Paginator(toate_prajiturile, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+
+
     context = {
         'page_obj': page_obj,
-        'titlu_pagina': 'Lista prajituri disponibile'
+        'titlu_pagina': 'Lista prajituri disponibile',
+        'sort_param' : sort_param,
     }
+    context = get_context_categorii(context)
     return render(request, 'Cofetarie/lista_produse.html', context)
 
-
+# --in lucru
 def pagina_contact(request):
-    return render(request, 'Cofetarie/in_lucru.html')
+    context = get_context_categorii()
+    return render(request, 'Cofetarie/in_lucru.html', context)
 
 def pagina_cos_virtual(request):
-    return render(request, 'Cofetarie/in_lucru.html')
+    context = get_context_categorii()
+    return render(request, 'Cofetarie/in_lucru.html', context)
 
 
 def pagina_info(request):
@@ -131,6 +154,7 @@ def pagina_info(request):
         'data_param': data_param,
         'a_param': a_param
     }
+    context = get_context_categorii(context)
     return render(request, 'Cofetarie/info.html', context)
 
 def pagina_log(request):
@@ -279,6 +303,7 @@ def pagina_log(request):
     ip = request.META.get('REMOTE_ADDR')
     context['user_ip'] = ip
     context['log_data_html'] = text_final
+    context = get_context_categorii(context)
 
     return render(request, 'Cofetarie/log.html', context)
 
@@ -291,8 +316,32 @@ def detalii_prajitura(request, id_prajitura):
         'prajitura': prajitura,
         'titlu_pagina': f"Detalii {prajitura.nume_prajitura}",
     }
-
+    context = get_context_categorii(context)
     return render(request, 'Cofetarie/detalii_prajitura.html', context)
+
+def detalii_categorie(request, cod_categorie):
+    choises_dict = dict(Prajitura.CategoriePrajitura.choices)
+    if cod_categorie not in choises_dict:
+        return render(request, 'Cofetarie/eroare_categorie.html', {'cod_categorie': cod_categorie})
+    
+    
+    nume_categorie = choises_dict[cod_categorie]
+    produse_categorie = Prajitura.objects.filter(categorie = cod_categorie).order_by('nume_prajitura')
+    
+    context = {
+        'cod_categorie': cod_categorie,
+        'nume_complet': nume_categorie,
+        'produse': produse_categorie,
+        'titlu_pagina': f"Produse din Categoria: {nume_categorie}",
+        'descriere_categorie': f"Aici găsiți toate prăjiturile noastre delicioase din categoria {nume_categorie}.",
+        'lista_categorii': Prajitura.CategoriePrajitura.choices,
+    }
+    context = get_context_categorii(context)
+    return render(request, 'Cofetarie/detalii_categorie.html', context)
+
+
+
+
 
 from .forms import ContactForm
 

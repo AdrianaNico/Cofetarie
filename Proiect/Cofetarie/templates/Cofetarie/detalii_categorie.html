@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titlu_pagina }}</title>
+</head>
+<body>
+
+    <h1>{{ nume_complet }}</h1>    
+    <p><strong>Descriere:</strong> {{ descriere_categorie }}</p>
+    
+    <hr>
+    
+    <h2>Prăjituri din această categorie ({{ produse.count }} găsite)</h2>
+    
+    {% for prajitura in produse %}
+        <article class="produs-categorie" style="border: 1px dashed #ccc; padding: 5px; margin-bottom: 5px;">
+            <h3>
+                <a href="{% url 'detalii_prajitura' id_prajitura=prajitura.id %}">
+                    {{ prajitura.nume_prajitura }}
+                </a>
+            </h3>
+            <p>Preț: {{ prajitura.pret }} RON</p>
+            </article>
+    {% empty %}
+        <p>Momentan nu există prăjituri în această categorie.</p>
+    {% endfor %}
+
+</body>
+</html>

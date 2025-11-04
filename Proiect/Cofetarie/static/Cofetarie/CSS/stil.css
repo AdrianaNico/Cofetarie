@@ -4,7 +4,9 @@ h1{
 a{
     color:rgb(78, 42, 132);
 }
-
+a:hover{
+    color:red;
+}
 .meniu-principal {
     background-color: #f3f3f3;
     overflow: hidden;

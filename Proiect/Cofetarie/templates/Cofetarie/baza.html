@@ -34,6 +34,17 @@
                         <a href="{% url 'despre' %}#echipa">Echipa</a>
                     </div>
                 </li>
+                <li class="dropdown">
+                    <a href="" class="dropbtn">Categorii</a>
+                    
+                    <div class="dropdown-content">
+                    {% for cod, nume in lista_categorii %}
+                        <a href="{% url 'detalii_categorie' cod_categorie=cod %}">
+                        {{ nume }}
+                    </a>
+                    {% endfor %}
+                    </div>
+                </li>    
                 
                 <li><a href="{% url 'produse' %}">Produse</a></li>
                 <li><a href="{% url 'contact' %}">Contact</a></li>
