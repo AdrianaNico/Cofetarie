@@ -173,6 +173,19 @@ class Prajitura(models.Model):
         NEGRESA = 'NG', 'Negresa'
         ECLER = 'EC', 'Ecler'
         ALTUL = 'AL', 'Altul'
+    # icon
+    ICONS_MAP = {
+        'RV': {'icon': 'fa-heart', 'color': '#A52A2A'},  # Red Velvet
+        'CS': {'icon': 'fa-lemon', 'color': '#FFD700'},  # Cheesecake
+        'CR': {'icon': 'fa-cogs', 'color': '#8B4513'},   # Cinnamon Rolls
+        'NG': {'icon': 'fa-square', 'color': '#4B0082'}, # Negresa
+        'EC': {'icon': 'fa-star', 'color': '#008000'},   # Ecler
+        'AL': {'icon': 'fa-circle-question', 'color': '#808080'}, # Altul
+    }
+    @property
+    def icon_info(self):
+        return self.ICONS_MAP.get(self.categorie, self.ICONS_MAP['AL'])
+    
     
     nume_prajitura = models.CharField(max_length=255)
     descriere_prajitura = models.TextField(null=True, blank=True)
@@ -190,11 +203,29 @@ class Prajitura(models.Model):
     
     class Meta:
         verbose_name_plural = "Prajituri"
+        
+# class Comanda(models.Model):
+#     data_comanda = models.DateTimeField(auto_now_add=True)
+#     tort_comandat = models.ForeignKey(Tort, on_delete=models.CASCADE, related_name="comenzi_torturi")
+#     prajitura_comandata = models.ManyToManyField(Prajitura, blank=True, related_name="comenzi_prajituri")
+#     total_plata = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!de pus poze la praji
+#     def __str__(self):
+#         return f"Comanda #{self.id} - Data: {self.data_comanda.strftime('%Y-%m-%d %H:%M:%S')}"
+
     
+# class User(models.Model):
+#     nume_user = models.CharField(max_length=150)
+#     prenume_user = models.CharField(max_length=150)
+#     email = models.EmailField(unique=True)
+#     telefon = models.CharField(max_length=10, null=True, blank=True)
+#     tara = models.CharField(max_length=100)
+#     judet = models.CharField(max_length=100)
+#     oras = models.CharField(max_length=100)
+#     strada = models.CharField(max_length=255)
+#     comanda = models.ManyToOneRelatedField(Comanda)
     
-    
-    
+#     def __str__(self):
+#         return self.nume_user + " " + self.prenume_user
     
     

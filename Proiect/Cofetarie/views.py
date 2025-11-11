@@ -5,7 +5,7 @@ from .models import Prajitura
 from django.db.models import Count
 from django.http import HttpResponse
 from datetime import datetime
-from .forms import ContactForm
+from .forms import FiltrePrajituraForm
 from django.core.paginator import Paginator
 
 from .models import Tort, Optinuni_decoratiune, Optiuni_blat, Optiuni_crema, Prajitura
@@ -104,6 +104,27 @@ def pagina_produse(request):
     sort_param = request.GET.get('sort', None)
     toate_prajiturile = Prajitura.objects.all()
     
+    form_data = request.GET
+    form = FiltrePrajituraForm(form_data)
+    toate_prajiturile = Prajitura.objects.all()
+    elemente_per_pagina = 5
+    
+    
+    if form.is_valid():
+        date_filtrate = form.cleaned_data
+        if date_filtrate['categorie']:
+            toate_prajiturile = toate_prajiturile.filter(categorie=date_filtrate['categorie'])
+        if date_filtrate['pret_min'] is not None:
+            toate_prajiturile = toate_prajiturile.filter(pret__gte=date_filtrate['pret_min']) #greater than or equal
+        if date_filtrate['pret_max'] is not None:
+            toate_prajiturile = toate_prajiturile.filter(pret__lte=date_filtrate['pret_max']) #less thanor equal
+        if date_filtrate['gramaj_min'] is not None:
+            toate_prajiturile = toate_prajiturile.filter(gramaj__gte=date_filtrate['gramaj_min'])
+        if date_filtrate['elemente_per_pagina'] is not None:
+            elemente_per_pagina = date_filtrate['elemente_per_pagina']
+            
+        if date_filtrate.get('elemente_per_pagina') is not None:
+            elemente_per_pagina = date_filtrate['elemente_per_pagina']
 #sortare
     if sort_param == 'a':
         toate_prajiturile = toate_prajiturile.order_by('pret')
@@ -112,16 +133,22 @@ def pagina_produse(request):
     else:
         toate_prajiturile = toate_prajiturile.order_by('nume_prajitura')    
     
-    paginator = Paginator(toate_prajiturile, 5)
+    paginator = Paginator(toate_prajiturile, elemente_per_pagina)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-
+    mesaj_repaginare = None
+    if form.is_valid():
+        valoare_form_paginare = form.cleaned_data['elemente_per_pagina']
+        if valoare_form_paginare != 5 and page_obj.number > 1:
+            mesaj_repaginare = "Ați modificat numărul de elemente pe pagină. Vă rugăm să rețineți că repaginarea poate schimba vizualizarea produselor deja văzute sau să sară peste altele."
 
     context = {
         'page_obj': page_obj,
         'titlu_pagina': 'Lista prajituri disponibile',
         'sort_param' : sort_param,
+        'form': form,
+        'mesaj_repaginare': mesaj_repaginare,
     }
     context = get_context_categorii(context)
     return render(request, 'Cofetarie/lista_produse.html', context)
@@ -343,40 +370,40 @@ def detalii_categorie(request, cod_categorie):
 
 
 
-from .forms import ContactForm
+# from .forms import ContactForm
 
-def contact_view(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():  
-            nume = form.cleaned_data['nume'] #dictionar
-            email = form.cleaned_data['email']
-            mesaj = form.cleaned_data['mesaj']
-            # procesarea datelor
+# def contact_view(request):
+#     if request.method == 'POST':
+#         form = ContactForm(request.POST)
+#         if form.is_valid():  
+#             nume = form.cleaned_data['nume'] #dictionar
+#             email = form.cleaned_data['email']
+#             mesaj = form.cleaned_data['mesaj']
+#             # procesarea datelor
             
-            return redirect('mesaj_trimis')
-    else:
-        form = ContactForm()
-    return render(request, 'aplicatie_exemplu/contact.html', {'form': form})
+#             return redirect('mesaj_trimis')
+#     else:
+#         form = ContactForm()
+#     return render(request, 'aplicatie_exemplu/contact.html', {'form': form})
 
 
 # ----formular
-def contact_view(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():  
-            nume = form.cleaned_data['nume']
-            email = form.cleaned_data['email']
-            mesaj = form.cleaned_data['mesaj']
-            return redirect('mesaj_trimis')
-    else:
-        form = ContactForm()
-    return render(request, 'aplicatie_exemplu/contact.html', {'form': form})
+# def contact_view(request):
+#     if request.method == 'POST':
+#         form = ContactForm(request.POST)
+#         if form.is_valid():  
+#             nume = form.cleaned_data['nume']
+#             email = form.cleaned_data['email']
+#             mesaj = form.cleaned_data['mesaj']
+#             return redirect('mesaj_trimis')
+#     else:
+#         form = ContactForm()
+#     return render(request, 'aplicatie_exemplu/contact.html', {'form': form})
 
 
-def clean(self):
-    cleaned_data = super().clean()
-    email = cleaned_data.get("email")
-    confirm_email = cleaned_data.get("confirm_email")
-    if email and confirm_email and email != confirm_email:
-        raise forms.ValidationError("Adresele de email nu coincid.")
+# def clean(self):
+#     cleaned_data = super().clean()
+#     email = cleaned_data.get("email")
+#     confirm_email = cleaned_data.get("confirm_email")
+#     if email and confirm_email and email != confirm_email:
+#         raise forms.ValidationError("Adresele de email nu coincid.")

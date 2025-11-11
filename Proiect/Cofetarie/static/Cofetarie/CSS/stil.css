@@ -5,7 +5,7 @@ a{
     color:rgb(78, 42, 132);
 }
 a:hover{
-    color:red;
+    color:rgb(140, 101, 149);
 }
 .meniu-principal {
     background-color: #f3f3f3;
@@ -62,4 +62,73 @@ a:hover{
 
 .dropdown:hover .dropdown-content {
     display: block;
+}
+
+.filtru-form {
+    margin-bottom: 2rem;
+    width: 100%; 
+}
+
+.filtru-card {
+    background: transparent; 
+    max-width: 70%;
+    margin: 0;
+    text-align: left;
+}
+
+.filtru-card h3 {
+    color: rgb(160, 88, 160);
+    font-size: 1.2rem; 
+    margin-bottom: 1rem;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: left;
+}
+
+.filtru-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 30px;
+    justify-items: start;
+    text-align: left;
+}
+
+.filtru-item label {
+    color: rgb(160, 88, 160); 
+    font-weight: 500; 
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.filtru-item input,
+.filtru-item select {
+    width: 100%;
+    border: 1px solid #ccc; 
+    border-radius: 4px; 
+    padding: 6px;
+    background-color: white;
+}
+
+.filtru-item input:focus,
+.filtru-item select:focus {
+    /* Focusul rămâne în culori vii */
+    outline: none;
+    border-color: magenta; 
+    box-shadow: 0 0 4px rgba(255, 0, 255, 0.4);
+}
+
+.filtru-buton {
+    background: rgb(172, 126, 172); 
+    border: 1px solid #cc00cc;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+.filtru-buton:hover {
+    background:rgb(204, 148, 204);
+    box-shadow: 0 2px 5px rgba(200, 0, 200, 0.3);
 }
