@@ -3,9 +3,23 @@
 
 
 {% block content %}
-    <div style="padding: 20px;">
-        {{ log_data_html|safe }}
-
-        <h1>Informatii despre server</h1>
-    </div>
+    <h1>Informatii despre server</h1>
+    <div style="background-color: #f9f9f9; padding: 15px; border: 1px solid #ddd;">
+            <h2>Secțiunea Parametri</h2>
+            
+            <p>Număr de parametri primiți: <strong>{{ numar_parametri }}</strong></p>
+            
+            <p>Numele parametrilor:</p>
+            {% if nume_parametri %}
+                <ul>
+                    {% for nume in nume_parametri %}
+                        <li>{{ nume }}</li>
+                    {% endfor %}
+                </ul>
+                
+                {% else %}
+                <p>Nu au fost primiți parametri.</p>
+            {% endif %}
+        </div>
+    
 {% endblock %}

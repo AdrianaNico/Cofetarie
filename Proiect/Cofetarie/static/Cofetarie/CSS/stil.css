@@ -3,6 +3,7 @@ h1{
 }
 a{
     color:rgb(78, 42, 132);
+    text-decoration: none;
 }
 a:hover{
     color:rgb(140, 101, 149);

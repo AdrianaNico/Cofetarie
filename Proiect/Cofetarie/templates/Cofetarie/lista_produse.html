@@ -4,26 +4,57 @@
 
 {% block content %}
     <header>
-        <h1>{{ titlu_pagina }}</h1>
+        {% if este_pagina_categorie %}
+            {% with first_prajitura=page_obj.object_list|first %}
+                {% if first_prajitura %}
+                    <h1>
+                        <i class="fa-solid {{ first_prajitura.icon_info.icon }}" 
+                            style="color: {{ first_prajitura.icon_info.color }}; margin-right: 10px;"></i>
+                        {{ nume_categorie }}
+                    </h1>
+                {% else %}
+                    <h1>{{ nume_categorie }}</h1>
+                {% endif %}
+            {% endwith %}
+        {% else %}
+            <h1>{{ titlu_pagina }}</h1>
+        {% endif %}
 
         {% if page_obj.paginator.count > 0 %}
             <p>Afișăm {{ page_obj.end_index }} din totalul de {{ page_obj.paginator.count }} produse.</p>
         {% else %}
             <p>Nu există produse momentan.</p>
         {% endif %}
+    </header>
 
-        </header>
+    {% if mesaj_repaginare %}
+        <div style="padding: 10px; background-color: #ecdaedff; color: #474347ff; border: 1px solid #48111fff; border-radius: 4px; margin-bottom: 20px; font-weight: bold;">
+            {{ mesaj_repaginare }}
+        </div>
+    {% endif %}
 
     <main class="lista-produse">
         
         <form method="get" class="filtru-form">
         <div class="filtru-card">
-            <h3>Filtrează prăjiturile</h3>
+            {% if este_pagina_categorie %}
+                <h3>Filtrează în {{ nume_categorie }}</h3>
+            {% else %}
+                <h3>Filtrează prăjiturile</h3>
+            {% endif %}
+            
             <div class="filtru-grid">
-            <div class="filtru-item">
-                {{ form.categorie.label_tag }}
-                {{ form.categorie }}
-            </div>
+            {% if not este_pagina_categorie %}
+                <div class="filtru-item">
+                    {{ form.categorie.label_tag }}
+                    {{ form.categorie }}
+                </div>
+            {% else %}
+                <div style="display: none;">
+                    {{ form.categorie }}
+                </div>
+            {% endif %}
+            
             <div class="filtru-item">
                 {{ form.pret_min.label_tag }}
                 {{ form.pret_min }}
@@ -41,10 +72,24 @@
                 {{ form.elemente_per_pagina }}
             </div>
             </div>
+            
             <button type="submit" class="filtru-buton">🍓 Filtrează</button>
+            
+            {% if este_pagina_categorie %}
+                <a href="{% url 'detalii_categorie' cod_categorie=cod_categorie %}" 
+                    onclick="return confirm('⚠️ Atenție! Sunteți sigur că doriți să resetați toate filtrele?');" 
+                    class="filtru-buton btn-reset">
+                    🔄 Resetează filtrele
+                </a>
+            {% else %}
+                <a href="{% url 'produse' %}" 
+                    onclick="return confirm('⚠️ Atenție! Sunteți sigur că doriți să resetați toate filtrele?');" 
+                    class="filtru-buton btn-reset">
+                    🔄 Resetează filtrele
+                </a>
+            {% endif %}
         </div>
         </form>
-
 
         {% if page_obj.object_list %}
             {% for prajitura in page_obj.object_list %}

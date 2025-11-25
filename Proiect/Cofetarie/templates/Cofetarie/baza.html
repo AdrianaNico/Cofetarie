@@ -63,8 +63,21 @@
     </main>
 
     <footer>
+        <p>IP-ul tău este: <strong>{{ user_ip }}</strong></p>
         <p>Proiect realizat de Gună Adriana Nicoleta</p>
         </footer>
 
 </body>
 </html>
+
+{% comment %} 
+
+fisierele sunt 
+-dinamice: se schimba in functie de utilizator
+-statice: nu se schimba niciodata: img, css, js 
+
+daca nu dam {% load static %} si vrem sa incarcam poze, primi eroare
+django cauta in tot proiectul un fisier numit static si de acolo ia imaginile
+daca puneam calea directa a imaginii in cod, puteam primi eroare in cazul in care locatia imaginii se schimba
+
+{% endcomment %}

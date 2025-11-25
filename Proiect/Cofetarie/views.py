@@ -7,12 +7,29 @@ from django.http import HttpResponse
 from datetime import datetime
 from .forms import FiltrePrajituraForm
 from django.core.paginator import Paginator
+from django import forms
+
 
 from .models import Tort, Optinuni_decoratiune, Optiuni_blat, Optiuni_crema, Prajitura
 
 
+from django.core.mail import send_mail
+
+# def trimite_email():
+#     send_mail(
+#         subject='Salutare! Gună Adriana Nicoleta',
+#         message='Salut. Ce mai faci?',
+#         html_message='<h1>Salut</h1><p>Ce mai faci?</p>',
+#         from_email='django.adriana@gmail.com',
+#         recipient_list=['test.tweb.node@gmail.com'],
+#         fail_silently=False,
+#     )
+
+def get_ip(request):
+    return request.META.get('REMOTE_ADDR')
+
 def index(request):
-	return HttpResponse(f"""
+    return HttpResponse(f"""
         <html>
         <p><b>Pe site-ul proiectului meu, utilizatorul va putea vizualiza si comanda diferite tipuri de prajituri si de torturi. Prajiturile si torturile vor fi de cateva tipuri prestabilite, insa torturile se pot si personaliza dupa preferinte, astfel: se poate alege din mai multe tipuri de blat, mai multe creme, diferite ornamente si mesaje scrise pe tort.
         </b></p>
@@ -92,96 +109,105 @@ def afis_produse(request):
 # -------------cofetarie
 
 def pagina_principala(request):
+    # trimite_email()
     context = get_context_categorii()
+    context['user_ip'] = get_ip(request)
     return render(request, 'Cofetarie/pagina_principala.html', context)
 
 def pagina_despre(request):
     context = get_context_categorii()
+    context['user_ip'] = get_ip(request)
     return render(request, 'Cofetarie/despre.html', context)
-
 
 def pagina_produse(request):
     sort_param = request.GET.get('sort', None)
-    toate_prajiturile = Prajitura.objects.all()
-    
     form_data = request.GET
     form = FiltrePrajituraForm(form_data)
+
+    VALOARE_IMPLICITA = 5
+    elemente_per_pagina_anterioare = request.session.get('elemente_per_pagina', VALOARE_IMPLICITA)
+    elemente_per_pagina = elemente_per_pagina_anterioare
+
     toate_prajiturile = Prajitura.objects.all()
-    elemente_per_pagina = 5
-    
-    
+    mesaj_repaginare = None
+# -----formular filtrare
     if form.is_valid():
         date_filtrate = form.cleaned_data
-        if date_filtrate['categorie']:
+
+        if date_filtrate.get('categorie'):
             toate_prajiturile = toate_prajiturile.filter(categorie=date_filtrate['categorie'])
-        if date_filtrate['pret_min'] is not None:
-            toate_prajiturile = toate_prajiturile.filter(pret__gte=date_filtrate['pret_min']) #greater than or equal
-        if date_filtrate['pret_max'] is not None:
-            toate_prajiturile = toate_prajiturile.filter(pret__lte=date_filtrate['pret_max']) #less thanor equal
-        if date_filtrate['gramaj_min'] is not None:
+        if date_filtrate.get('pret_min') is not None:
+            toate_prajiturile = toate_prajiturile.filter(pret__gte=date_filtrate['pret_min'])
+        if date_filtrate.get('pret_max') is not None:
+            toate_prajiturile = toate_prajiturile.filter(pret__lte=date_filtrate['pret_max'])
+        if date_filtrate.get('gramaj_min') is not None:
             toate_prajiturile = toate_prajiturile.filter(gramaj__gte=date_filtrate['gramaj_min'])
-        if date_filtrate['elemente_per_pagina'] is not None:
-            elemente_per_pagina = date_filtrate['elemente_per_pagina']
-            
-        if date_filtrate.get('elemente_per_pagina') is not None:
-            elemente_per_pagina = date_filtrate['elemente_per_pagina']
-#sortare
+
+        valoare_noua = date_filtrate.get('elemente_per_pagina')
+
+        if valoare_noua is not None:
+            valoare_noua = int(valoare_noua)
+            if valoare_noua != elemente_per_pagina_anterioare:
+                mesaj_repaginare = (
+                    "Ați modificat numărul de elemente pe pagină. "
+                    "Vă rugăm să rețineți că repaginarea poate schimba vizualizarea produselor deja văzute."
+                )
+
+            elemente_per_pagina = valoare_noua
+
+            if valoare_noua == VALOARE_IMPLICITA:
+                request.session.pop('elemente_per_pagina', None)
+            else:
+                request.session['elemente_per_pagina'] = valoare_noua
+
     if sort_param == 'a':
         toate_prajiturile = toate_prajiturile.order_by('pret')
-    elif sort_param =='d':
+    elif sort_param == 'd':
         toate_prajiturile = toate_prajiturile.order_by('-pret')
     else:
-        toate_prajiturile = toate_prajiturile.order_by('nume_prajitura')    
-    
+        toate_prajiturile = toate_prajiturile.order_by('nume_prajitura')
+
     paginator = Paginator(toate_prajiturile, elemente_per_pagina)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    mesaj_repaginare = None
-    if form.is_valid():
-        valoare_form_paginare = form.cleaned_data['elemente_per_pagina']
-        if valoare_form_paginare != 5 and page_obj.number > 1:
-            mesaj_repaginare = "Ați modificat numărul de elemente pe pagină. Vă rugăm să rețineți că repaginarea poate schimba vizualizarea produselor deja văzute sau să sară peste altele."
-
     context = {
         'page_obj': page_obj,
         'titlu_pagina': 'Lista prajituri disponibile',
-        'sort_param' : sort_param,
+        'sort_param': sort_param,
         'form': form,
         'mesaj_repaginare': mesaj_repaginare,
     }
     context = get_context_categorii(context)
+    context['user_ip'] = get_ip(request)
     return render(request, 'Cofetarie/lista_produse.html', context)
+
 
 # --in lucru
 def pagina_contact(request):
     context = get_context_categorii()
+    context['user_ip'] = get_ip(request)
     return render(request, 'Cofetarie/in_lucru.html', context)
 
 def pagina_cos_virtual(request):
     context = get_context_categorii()
+    context['user_ip'] = get_ip(request)
     return render(request, 'Cofetarie/in_lucru.html', context)
 
 
 def pagina_info(request):
     
     ip = request.META.get('REMOTE_ADDR')
-    data_param = request.GET.get("data", "N/A")
-    a_list = request.GET.getlist("a")
-    a_param = "N/A"
     
-    if a_list:
-        try:
-            a_param = int(a_list[-1])
-        except (ValueError, IndexError):
-            a_param = f"Valoare invalidă ('{a_list[-1]}')"
+    nr_param = len(request.GET)
+    nume_param = list(request.GET.keys())
     
     context = {
-        'user_ip': ip,
-        'data_param': data_param,
-        'a_param': a_param
+        "user_ip": ip,
+        "numar_parametri": nr_param,
+        "nume_parametri": nume_param,
     }
-    context = get_context_categorii(context)
+    context['user_ip'] = get_ip(request)
     return render(request, 'Cofetarie/info.html', context)
 
 def pagina_log(request):
@@ -237,7 +263,11 @@ def pagina_log(request):
             iduri_int = [int(id_str.strip()) for id_str in lista_iduri_finale]
             # luam obiectele din bd
             accesari_gasite = {acc.id: acc for acc in Accesare.objects.filter(id__in=iduri_int)}
-            accesari = list(accesari_gasite.values())
+            accesari = [
+                accesari_gasite[id_int]
+                for id_int in iduri_int
+                if id_int in accesari_gasite
+            ]
         
         except ValueError:
                 mesaj_eroare = "Eroare: unul dintre ID-urile specificate nu este un număr valid."   
@@ -277,17 +307,17 @@ def pagina_log(request):
             text_final += "<table border='1' style='border-collapse: collapse; width: 80%; margin-top: 20px;'>"
 
             #antetul tabelului
-            text_final+="<thead style='background-color: #f2f2f2;'><tr>"
+            text_final+="<thead style='background-color: #ecd4ea;'><tr>"
             for col in coloane:
                 text_final += f"<th>{col.replace('_', ' ').capitalize()}</th>"
-                text_final += "</tr></thead>"
+            text_final += "</tr></thead>"
                 
             #corpul tabelului
             text_final += "<tbody>"
             for acc in accesari:
                 text_final += "<tr>"
                 for col in coloane:
-                    valoare = getattr(acc, col, "N/A")
+                    valoare = getattr(acc, col, "N/A") # din acc(care contine adresa pt fiecare adresa) luam ce este in col pe rand(col este o lista care contine numele capetelor de tabel)
                     text_final += f"<td style='padding: 8px; text-align: left;'>{valoare}</td>"
                 text_final += "</tr>"
             text_final += "</tbody>"    
@@ -308,14 +338,15 @@ def pagina_log(request):
     if accesari:
         text_final += "<ul>"
         for acc in accesari:
-            text_final += f"<li>ID: {acc.id}, Data: {acc.data_accesare}, IP: {acc.ip_client}, URL: {acc.url_text}</li>"
+            text_final += f"<li>ID: {acc.id}, URL: {acc.url_text}</li>"
         text_final += "</ul>"
     elif not mesaj_eroare:
         text_final += "<p>Nu există accesări de afișat conform filtrelor aplicate.</p>" 
         
 
 #------------statistici de accesare
-    statistici=list(Accesare.objects.values('url_text').annotate(numar=Count('url_text')))
+    statistici=list(Accesare.objects.values('url_text').annotate(numar=Count('url_text'))) #agregare
+    #dictionar cu url_text si numar de aparitii pt fiecare url_text
     
     if statistici:
         cel_mai_putin=min(statistici, key=lambda x: x['numar'])
@@ -331,7 +362,6 @@ def pagina_log(request):
     context['user_ip'] = ip
     context['log_data_html'] = text_final
     context = get_context_categorii(context)
-
     return render(request, 'Cofetarie/log.html', context)
 
 
@@ -344,28 +374,73 @@ def detalii_prajitura(request, id_prajitura):
         'titlu_pagina': f"Detalii {prajitura.nume_prajitura}",
     }
     context = get_context_categorii(context)
+    context['user_ip'] = get_ip(request)
     return render(request, 'Cofetarie/detalii_prajitura.html', context)
 
 def detalii_categorie(request, cod_categorie):
-    choises_dict = dict(Prajitura.CategoriePrajitura.choices)
-    if cod_categorie not in choises_dict:
+    choices_dict = dict(Prajitura.CategoriePrajitura.choices)
+    if cod_categorie not in choices_dict:
         return render(request, 'Cofetarie/eroare_categorie.html', {'cod_categorie': cod_categorie})
+    nume_categorie = choices_dict[cod_categorie]
+
+    form_data = request.GET.copy()
+    form_data['categorie'] = cod_categorie
+
+    form = FiltrePrajituraForm(form_data)
     
+    VALOARE_IMPLICITA = 5
+    elemente_per_pagina_anterioare = request.session.get('elemente_per_pagina', VALOARE_IMPLICITA)
+    elemente_per_pagina = elemente_per_pagina_anterioare
+    mesaj_repaginare = None
     
-    nume_categorie = choises_dict[cod_categorie]
-    produse_categorie = Prajitura.objects.filter(categorie = cod_categorie).order_by('nume_prajitura')
+    produse_categorie = Prajitura.objects.filter(categorie=cod_categorie).order_by('nume_prajitura')
+    
+    if form.is_valid():
+        date_filtrate = form.cleaned_data
+        
+        if date_filtrate.get('pret_min') is not None:
+            produse_categorie = produse_categorie.filter(pret__gte=date_filtrate['pret_min'])
+        if date_filtrate.get('pret_max') is not None:
+            produse_categorie = produse_categorie.filter(pret__lte=date_filtrate['pret_max'])
+        if date_filtrate.get('gramaj_min') is not None:
+            produse_categorie = produse_categorie.filter(gramaj__gte=date_filtrate['gramaj_min'])
+        
+        valoare_noua = date_filtrate.get('elemente_per_pagina')
+        
+        if valoare_noua is not None:
+            valoare_noua = int(valoare_noua)
+            if valoare_noua != elemente_per_pagina_anterioare:
+                mesaj_repaginare = (
+                    "Ați modificat numărul de elemente pe pagină. "
+                    "Vă rugăm să rețineți că repaginarea poate schimba vizualizarea produselor deja văzute."
+                )
+            
+            elemente_per_pagina = valoare_noua
+            
+            if valoare_noua == VALOARE_IMPLICITA:
+                request.session.pop('elemente_per_pagina', None)
+            else:
+                request.session['elemente_per_pagina'] = valoare_noua
+    
+    form.fields['categorie'].widget = forms.HiddenInput()
+    
+    # Paginare
+    paginator = Paginator(produse_categorie, elemente_per_pagina)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
     context = {
+        'page_obj': page_obj,
+        'titlu_pagina': f'Categoria: {nume_categorie}',
         'cod_categorie': cod_categorie,
-        'nume_complet': nume_categorie,
-        'produse': produse_categorie,
-        'titlu_pagina': f"Produse din Categoria: {nume_categorie}",
-        'descriere_categorie': f"Aici găsiți toate prăjiturile noastre delicioase din categoria {nume_categorie}.",
-        'lista_categorii': Prajitura.CategoriePrajitura.choices,
+        'nume_categorie': nume_categorie,
+        'form': form,
+        'mesaj_repaginare': mesaj_repaginare,
+        'este_pagina_categorie': True,
     }
     context = get_context_categorii(context)
-    return render(request, 'Cofetarie/detalii_categorie.html', context)
-
+    context['user_ip'] = get_ip(request)
+    return render(request, 'Cofetarie/lista_produse.html', context)
 
 
 
@@ -407,3 +482,5 @@ def detalii_categorie(request, cod_categorie):
 #     confirm_email = cleaned_data.get("confirm_email")
 #     if email and confirm_email and email != confirm_email:
 #         raise forms.ValidationError("Adresele de email nu coincid.")
+
+
