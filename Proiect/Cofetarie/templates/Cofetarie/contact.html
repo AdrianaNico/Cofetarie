@@ -1,0 +1,136 @@
+{% extends 'Cofetarie/baza.html' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<div class="contact-container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <header>
+        <h1>📧 Contactează-ne</h1>
+        <p>Completează formularul de mai jos și te vom contacta în cel mai scurt timp.</p>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="padding: 15px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 20px;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" class="contact-form" style="background: #f9f9f9; padding: 30px; border-radius: 8px;">
+        {% csrf_token %}
+        
+        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                {{ form.nume.label_tag }}
+                {{ form.nume }}
+                {% if form.nume.errors %}
+                    <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.nume.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.prenume.label_tag }}
+                {{ form.prenume }}
+                {% if form.prenume.errors %}
+                    <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.prenume.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.cnp.label_tag }}
+                {{ form.cnp }}
+                {% if form.cnp.errors %}
+                    <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.cnp.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.data_nasterii.label_tag }}
+                {{ form.data_nasterii }}
+                {% if form.data_nasterii.errors %}
+                    <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.data_nasterii.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.email.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.confirmare_email.label_tag }}
+                {{ form.confirmare_email }}
+                {% if form.confirmare_email.errors %}
+                    <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.confirmare_email.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.tip_mesaj.label_tag }}
+                {{ form.tip_mesaj }}
+                {% if form.tip_mesaj.errors %}
+                    <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.tip_mesaj.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.minim_zile_asteptare.label_tag }}
+                {{ form.minim_zile_asteptare }}
+                {% if form.minim_zile_asteptare.help_text %}
+                    <small style="color: #666; font-size: 0.85em; display: block; margin-top: 5px;">
+                        ℹ️ {{ form.minim_zile_asteptare.help_text }}
+                    </small>
+                {% endif %}
+                {% if form.minim_zile_asteptare.errors %}
+                    <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                        {{ form.minim_zile_asteptare.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+            {{ form.subiect.label_tag }}
+            {{ form.subiect }}
+            {% if form.subiect.errors %}
+                <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                    {{ form.subiect.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+            {{ form.mesaj.label_tag }}
+            {{ form.mesaj }}
+            {% if form.mesaj.errors %}
+                <div class="error" style="color: #d32f2f; font-size: 0.9em; margin-top: 5px;">
+                    {{ form.mesaj.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" style="margin-top: 20px; padding: 12px 30px; background-color: #48111f; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;">
+            📤 Trimite Mesajul
+        </button>
+    </form>
+</div>
+
+{% endblock %}

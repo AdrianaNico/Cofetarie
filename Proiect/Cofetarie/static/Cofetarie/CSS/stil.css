@@ -133,3 +133,125 @@ a:hover{
     background:rgb(204, 148, 204);
     box-shadow: 0 2px 5px rgba(200, 0, 200, 0.3);
 }
+
+/* Styling pentru dropdown ingrediente */
+.ingrediente-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.ingrediente-select:focus {
+    outline: none;
+    border-color: #48111f;
+    box-shadow: 0 0 5px rgba(72, 17, 31, 0.3);
+}
+
+/* Opțiunile selectate */
+.ingrediente-select option:checked {
+    background-color: #ecdaed;
+    color: #48111f;
+    font-weight: bold;
+}
+
+.ingrediente-select option {
+    padding: 8px;
+}
+
+
+
+.alert-success {
+    padding: 15px;
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb; 
+    border-radius: 4px; 
+    margin-bottom: 20px;
+}
+
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form input[type="date"],
+.contact-form input[type="number"],
+.contact-form select,
+.contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.contact-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.contact-form button:hover {
+    background-color: #6a1a2e;
+}
+
+.error {
+    color: #d32f2f;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.contact-form {
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-top: 20px;
+}
+
+.form-grid {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px;
+}
+
+/* contact */
+    .contact-form input[type="text"],
+    .contact-form input[type="email"],
+    .contact-form input[type="date"],
+    .contact-form input[type="number"],
+    .contact-form select,
+    .contact-form textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .contact-form textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .contact-form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .contact-form button:hover {
+        background-color: #6a1a2e;
+    }

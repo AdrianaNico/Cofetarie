@@ -1,20 +1,23 @@
 {% extends 'Cofetarie/baza.html' %}
 
-{% block title %}Lista Produse{% endblock %}
+{% block title %}
+    {% if este_pagina_categorie %}{{ nume_complet }}{% else %}{{ titlu_pagina }}{% endif %}
+{% endblock %}
 
 {% block content %}
     <header>
         {% if este_pagina_categorie %}
             {% with first_prajitura=page_obj.object_list|first %}
-                {% if first_prajitura %}
-                    <h1>
+                <h1>
+                    {% if first_prajitura %}
                         <i class="fa-solid {{ first_prajitura.icon_info.icon }}" 
-                            style="color: {{ first_prajitura.icon_info.color }}; margin-right: 10px;"></i>
-                        {{ nume_categorie }}
-                    </h1>
-                {% else %}
-                    <h1>{{ nume_categorie }}</h1>
-                {% endif %}
+                            style="color: {{ first_prajitura.icon_info.color }}; margin-right: 10px;">
+                            {{titlu_pagina}}
+                        </i>
+                    {% endif %}
+                    {{ nume_complet }}
+                </h1>
+                <p><strong>Descriere:</strong> {{ descriere_categorie }}</p>
             {% endwith %}
         {% else %}
             <h1>{{ titlu_pagina }}</h1>
@@ -22,13 +25,21 @@
 
         {% if page_obj.paginator.count > 0 %}
             <p>Afișăm {{ page_obj.end_index }} din totalul de {{ page_obj.paginator.count }} produse.</p>
-        {% else %}
-            <p>Nu există produse momentan.</p>
         {% endif %}
     </header>
 
+    {% if messages %}
+        <div class="mesaje-container" style="max-width: 800px; margin: 10px auto;">
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}" style="padding: 10px; border-radius: 4px; margin-bottom: 5px; background: #e2d3e1ff; border: 1px solid #d6d8db;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     {% if mesaj_repaginare %}
-        <div style="padding: 10px; background-color: #ecdaedff; color: #474347ff; border: 1px solid #48111fff; border-radius: 4px; margin-bottom: 20px; font-weight: bold;">
+        <div style="padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 4px; margin-bottom: 20px;">
             {{ mesaj_repaginare }}
         </div>
     {% endif %}
@@ -36,92 +47,68 @@
     <main class="lista-produse">
         
         <form method="get" class="filtru-form">
-        <div class="filtru-card">
-            {% if este_pagina_categorie %}
-                <h3>Filtrează în {{ nume_categorie }}</h3>
-            {% else %}
-                <h3>Filtrează prăjiturile</h3>
-            {% endif %}
-            
-            <div class="filtru-grid">
-            {% if not este_pagina_categorie %}
-                <div class="filtru-item">
-                    {{ form.categorie.label_tag }}
-                    {{ form.categorie }}
+            <div class="filtru-card">
+                <h3>Filtrează {% if este_pagina_categorie %}în {{ nume_complet }}{% else %}prăjiturile{% endif %}</h3>
+                
+                <div class="filtru-grid">
+                    {% if not este_pagina_categorie %}
+                        <div class="filtru-item">
+                            {{ form.categorie.label_tag }}
+                            {{ form.categorie }}
+                        </div>
+                    {% else %}
+                        <div style="display: none;">{{ form.categorie }}</div>
+                    {% endif %}
+                    
+                    <div class="filtru-item">{{ form.pret_min.label_tag }}{{ form.pret_min }}</div>
+                    <div class="filtru-item">{{ form.pret_max.label_tag }}{{ form.pret_max }}</div>
+                    <div class="filtru-item">{{ form.gramaj_min.label_tag }}{{ form.gramaj_min }}</div>
+                    <div class="filtru-item">{{ form.gramaj_max.label_tag }}{{ form.gramaj_max }}</div>
+                    <div class="filtru-item">{{ form.ingrediente.label_tag }}{{ form.ingrediente }}</div>
+                    <div class="filtru-item">{{ form.elemente_per_pagina.label_tag }}{{ form.elemente_per_pagina }}</div>
                 </div>
-            {% else %}
-                <div style="display: none;">
-                    {{ form.categorie }}
+                
+                <div class="butoane-actiune">
+                    <button type="submit" class="filtru-buton">🍓 Filtrează</button>
+                    
+                    {% if este_pagina_categorie %}
+                        <a href="{% url 'detalii_categorie' cod_categorie=cod_categorie %}" 
+                        onclick="return confirm('⚠️ Atenție!\n\nEști pe cale să ștergi toate filtrele selectate și să revii la valorile implicite.\n\nEști sigur că vrei să continui?');"
+                        class="filtru-buton btn-reset">
+                        🔄 Resetează
+                        </a>
+                    {% else %}
+                        <a href="{% url 'produse' %}" 
+                        onclick="return confirm('⚠️ Atenție!\n\nEști pe cale să ștergi toate filtrele selectate și să revii la valorile implicite.\n\nEști sigur că vrei să continui?');"
+                        class="filtru-buton btn-reset">
+                        🔄 Resetează
+                        </a>
+                    {% endif %}
                 </div>
-            {% endif %}
-            
-            <div class="filtru-item">
-                {{ form.pret_min.label_tag }}
-                {{ form.pret_min }}
             </div>
-            <div class="filtru-item">
-                {{ form.pret_max.label_tag }}
-                {{ form.pret_max }}
-            </div>
-            <div class="filtru-item">
-                {{ form.gramaj_min.label_tag }}
-                {{ form.gramaj_min }}
-            </div>
-            <div class="filtru-item">
-                {{ form.elemente_per_pagina.label_tag }}
-                {{ form.elemente_per_pagina }}
-            </div>
-            </div>
-            
-            <button type="submit" class="filtru-buton">🍓 Filtrează</button>
-            
-            {% if este_pagina_categorie %}
-                <a href="{% url 'detalii_categorie' cod_categorie=cod_categorie %}" 
-                    onclick="return confirm('⚠️ Atenție! Sunteți sigur că doriți să resetați toate filtrele?');" 
-                    class="filtru-buton btn-reset">
-                    🔄 Resetează filtrele
-                </a>
-            {% else %}
-                <a href="{% url 'produse' %}" 
-                    onclick="return confirm('⚠️ Atenție! Sunteți sigur că doriți să resetați toate filtrele?');" 
-                    class="filtru-buton btn-reset">
-                    🔄 Resetează filtrele
-                </a>
-            {% endif %}
-        </div>
         </form>
 
         {% if page_obj.object_list %}
             {% for prajitura in page_obj.object_list %}
                 <article class="produs" style="display: flex; align-items: flex-start; gap: 20px; padding: 15px;">
-                    
                     {% if prajitura.imagine %}
                         <div class="produs-imagine">
-                            <img src="{{ prajitura.imagine.url }}" alt="Imagine {{ prajitura.nume_prajitura }}" 
-                                style="max-width: 120px; height: auto; border-radius: 4px;">
+                            <img src="{{ prajitura.imagine.url }}" alt="{{ prajitura.nume_prajitura }}" style="max-width: 120px; height: auto; border-radius: 4px;">
                         </div>
                     {% endif %}
                     
                     <div class="produs-detalii">
-                        
                         <h2>
-                            <a href="{% url 'detalii_prajitura' id_prajitura=prajitura.id %}">
-                                {{ prajitura.nume_prajitura }}
-                            </a>
+                            <a href="{% url 'detalii_prajitura' id_prajitura=prajitura.id %}">{{ prajitura.nume_prajitura }}</a>
                         </h2>
-                        
                         <ul>
                             <li>
-                                <i class="fa-solid {{ prajitura.icon_info.icon }}" 
-                                style="color: {{ prajitura.icon_info.color }}; margin-right: 5px;"></i>
-                                
+                                <i class="fa-solid {{ prajitura.icon_info.icon }}" style="color: {{ prajitura.icon_info.color }}; margin-right: 5px;"></i>
                                 <strong>Categoria:</strong> 
-                                <a href="{% url 'detalii_categorie' cod_categorie=prajitura.categorie %}" 
-                                style="color: #333; text-decoration: underline;">
+                                <a href="{% url 'detalii_categorie' cod_categorie=prajitura.categorie %}" style="color: #333; text-decoration: underline;">
                                     {{ prajitura.get_categorie_display }}
                                 </a>
                             </li>
-                            
                             <li><strong>Preț:</strong> {{ prajitura.pret }} RON</li>
                             <li><strong>Gramaj:</strong> {{ prajitura.gramaj }} grame</li>
                         </ul>
@@ -130,27 +117,33 @@
                 <hr>
             {% endfor %}
         {% else %}
-            <p>Nu există produse momentan.</p>
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <h3>Nu există produse momentan.</h3>
+                <p>Încearcă să resetezi filtrele.</p>
+            </div>
         {% endif %}
     </main>
 
-    <nav class="pagination">
-        <span class="step-links">
-            {% with q_string=request.GET.urlencode|cut:'page' %}
-                {% if page_obj.has_previous %}
-                    <a href="?{{ q_string }}&page=1">« Prima</a>
-                    <a href="?{{ q_string }}&page={{ page_obj.previous_page_number }}">Precedentă</a>
-                {% endif %}
-    
-                <span class="current-page">
-                    Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}.
-                </span>
-    
-                {% if page_obj.has_next %}
-                    <a href="?{{ q_string }}&page={{ page_obj.next_page_number }}">Următoare</a>
-                    <a href="?{{ q_string }}&page={{ page_obj.paginator.num_pages }}">Ultima »</a>
-                {% endif %}
-            {% endwith %}
-        </span>
-    </nav>
+    {% if page_obj.has_other_pages %}
+        <nav class="pagination">
+            <span class="step-links">
+                {% with q_string=request.GET.urlencode|cut:'page' %}
+                    {% if page_obj.has_previous %}
+                        <a href="?{{ q_string }}&page=1">« Prima</a>
+                        <a href="?{{ q_string }}&page={{ page_obj.previous_page_number }}">Precedentă</a>
+                    {% endif %}
+        
+                    <span class="current-page">
+                        Pagina {{ page_obj.number }} din {{ page_obj.paginator.num_pages }}.
+                    </span>
+        
+                    {% if page_obj.has_next %}
+                        <a href="?{{ q_string }}&page={{ page_obj.next_page_number }}">Următoare</a>
+                        <a href="?{{ q_string }}&page={{ page_obj.paginator.num_pages }}">Ultima »</a>
+                    {% endif %}
+                {% endwith %}
+            </span>
+        </nav>
+    {% endif %}
+
 {% endblock %}

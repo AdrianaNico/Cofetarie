@@ -1,13 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Accesare
-from .models import Locatie
-from .models import Prajitura
+from django.shortcuts import render, redirect
+from .models import Accesare, Locatie, Prajitura
 from django.db.models import Count
 from django.http import HttpResponse
 from datetime import datetime
-from .forms import FiltrePrajituraForm
+from .forms import FiltrePrajituraForm, ContactForm
+from django.contrib import messages
 from django.core.paginator import Paginator
 from django import forms
+import os #pentru operatii pe fisiere
+import json
+import time
+from django.conf import settings #pentru a obtine calea radacina a proiectului
 
 
 from .models import Tort, Optinuni_decoratiune, Optiuni_blat, Optiuni_crema, Prajitura
@@ -133,6 +136,11 @@ def pagina_produse(request):
 # -----formular filtrare
     if form.is_valid():
         date_filtrate = form.cleaned_data
+        
+        ingrediente_selectate = date_filtrate.get('ingrediente')
+        if ingrediente_selectate:
+            for ingredient in ingrediente_selectate:
+                toate_prajiturile = toate_prajiturile.filter(ingrediente=ingredient)
 
         if date_filtrate.get('categorie'):
             toate_prajiturile = toate_prajiturile.filter(categorie=date_filtrate['categorie'])
@@ -167,9 +175,11 @@ def pagina_produse(request):
     else:
         toate_prajiturile = toate_prajiturile.order_by('nume_prajitura')
 
-    paginator = Paginator(toate_prajiturile, elemente_per_pagina)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    paginator = Paginator(toate_prajiturile, elemente_per_pagina) #numara cate produse o sa fie in total si imparte la elemente_per_pagina pt a vedea nr de elem pe pagina
+    page_number = request.GET.get('page') #extrage nr paginii curente din url: ?page=2
+    page_obj = paginator.get_page(page_number) #cere obiectele de la indexul 5 la 10(in cazul paginii 2, daca sunt 5 elem pe pagina)--se face un sql care cere
+# page list contine: DATE .object_list(lista cu prajiturile de la indexurile cerute)
+#                    METADATE: .number(pagina curenta), .paginator.num_pages(nr total de pagini), .has_next(), .has_previous(), .next_page_number(), .previous_page_number()
 
     context = {
         'page_obj': page_obj,
@@ -183,11 +193,50 @@ def pagina_produse(request):
     return render(request, 'Cofetarie/lista_produse.html', context)
 
 
-# --in lucru
+
 def pagina_contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            date_mesaj = form.cleaned_data
+            date_mesaj.pop('confirmare_email', None)
+            date_mesaj['user_ip'] = get_ip(request)
+            date_mesaj['data_ora_sosire'] = str(datetime.now())
+            
+            timestamp = int(time.time()) #
+            nume_fisier = f"mesaj_{timestamp}"
+            if date_mesaj.get('urgent') is True:
+                nume_fisier += "_urgent"
+            nume_fisier += ".json"
+            
+            # cream calea catre folderul de mesaje
+            # settings.BASE_DIR este radacina proiectului
+            cale_folder = os.path.join(settings.BASE_DIR, 'Cofetarie', 'Mesaje') #creaza calea in functie de sistemul de operare
+            os.makedirs(cale_folder, exist_ok=True)#cream folderul daca nu exista, mkdirS ca sa fie recursiv
+            cale_fisier = os.path.join(cale_folder, nume_fisier)
+            
+            try:
+                with open(cale_fisier, 'w', encoding='utf-8') as f: # f variabila temporara 
+                    # indent=4 face fișierul ușor de citit de oameni
+                    # default=str transformă obiectele Date/Datetime în text (altfel JSON dă eroare)
+                    json.dump(date_mesaj, f, indent=4, default=str, ensure_ascii=False) #scrie in fisier
+                    
+                messages.success(request, '✅ Mesajul tău a fost trimis cu succes! Te vom contacta în curând.')
+                    
+            except Exception as e:
+                print(f"Eroare la salvarea fișierului: {e}")
+                messages.error(request, 'A apărut o eroare la salvarea mesajului.')
+
+            return redirect('contact')
+
+    else:
+        form = ContactForm()
+    
     context = get_context_categorii()
+    context['form'] = form
     context['user_ip'] = get_ip(request)
-    return render(request, 'Cofetarie/in_lucru.html', context)
+    return render(request, 'Cofetarie/contact.html', context)
+
 
 def pagina_cos_virtual(request):
     context = get_context_categorii()
@@ -368,7 +417,12 @@ def pagina_log(request):
 # detalii prajitura
 
 def detalii_prajitura(request, id_prajitura):
-    prajitura = get_object_or_404(Prajitura, pk = id_prajitura)
+    try:
+        
+        prajitura = Prajitura.objects.get(id=id_prajitura)
+    except Prajitura.DoesNotExist:
+        messages.error(request, f"Ne pare rău, prăjitura {id_prajitura} nu există.")
+        return redirect('produse')
     context ={
         'prajitura': prajitura,
         'titlu_pagina': f"Detalii {prajitura.nume_prajitura}",
@@ -380,15 +434,21 @@ def detalii_prajitura(request, id_prajitura):
 def detalii_categorie(request, cod_categorie):
     choices_dict = dict(Prajitura.CategoriePrajitura.choices)
     if cod_categorie not in choices_dict:
-        return render(request, 'Cofetarie/eroare_categorie.html', {'cod_categorie': cod_categorie})
+        messages.error(request, f"Codul de categorie '{cod_categorie}' este invalid. Vă rugăm să alegeți o categorie validă din meniu.")
+        return redirect('produse')
     nume_categorie = choices_dict[cod_categorie]
 
     form_data = request.GET.copy()
-    form_data['categorie'] = cod_categorie
+    
+    categoria_din_url_params = request.GET.get('categorie')
+    if categoria_din_url_params and categoria_din_url_params != cod_categorie:
+        messages.error(request, "⛔ Eroare de securitate: Nu aveți voie să modificați categoria manual pe această pagină! Filtrele au fost resetate la categoria curentă.")
+
+    form_data['categorie'] = cod_categorie #adaugam fortat parametrul pt categorie
 
     form = FiltrePrajituraForm(form_data)
     
-    VALOARE_IMPLICITA = 5
+    VALOARE_IMPLICITA = 5 #incearca sa preia valoarea din sesiunea anterioara. daca nu exista, o foloseste pe cea implicita
     elemente_per_pagina_anterioare = request.session.get('elemente_per_pagina', VALOARE_IMPLICITA)
     elemente_per_pagina = elemente_per_pagina_anterioare
     mesaj_repaginare = None
@@ -398,6 +458,11 @@ def detalii_categorie(request, cod_categorie):
     if form.is_valid():
         date_filtrate = form.cleaned_data
         
+        ingrediente_selectate = date_filtrate.get('ingrediente')
+        if ingrediente_selectate:
+            for ingredient in ingrediente_selectate:
+                produse_categorie = produse_categorie.filter(ingrediente=ingredient)
+                
         if date_filtrate.get('pret_min') is not None:
             produse_categorie = produse_categorie.filter(pret__gte=date_filtrate['pret_min'])
         if date_filtrate.get('pret_max') is not None:
@@ -422,7 +487,7 @@ def detalii_categorie(request, cod_categorie):
             else:
                 request.session['elemente_per_pagina'] = valoare_noua
     
-    form.fields['categorie'].widget = forms.HiddenInput()
+    form.fields['categorie'].widget = forms.HiddenInput(attrs={'readonly': 'readonly'})
     
     # Paginare
     paginator = Paginator(produse_categorie, elemente_per_pagina)
