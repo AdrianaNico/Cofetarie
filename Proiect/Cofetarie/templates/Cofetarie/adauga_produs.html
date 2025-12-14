@@ -1,0 +1,71 @@
+{% extends 'Cofetarie/baza.html' %}
+
+{% block title %}Adaugă Produs Nou{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 700px; margin: 30px auto; padding: 25px; background: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    
+    <header style="text-align: center; margin-bottom: 30px;">
+        <h2 style="color: #48111f;">🍰 Adaugă o Prăjitură Nouă</h2>
+        <p style="color: #666;">Completați detaliile de mai jos. Prețul va fi calculat automat.</p>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {{ message.tags }}" style="padding: 10px; margin-bottom: 20px; border-radius: 4px; 
+                {% if message.tags == 'success' %}background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;{% endif %}
+                {% if message.tags == 'error' %}background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="general-errors" style="background-color: #ffebee; border: 1px solid #ffcdd2; color: #b71c1c; padding: 10px; margin-bottom: 20px; border-radius: 4px;">
+                {% for error in form.non_field_errors %}
+                    <p style="margin: 0;">⚠️ {{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="form-group" style="margin-bottom: 20px;">
+                
+                <div class="label-area" style="font-weight: bold; margin-bottom: 5px;">
+                    {{ field.label_tag }}
+                    {% if field.field.required %}<span style="color: red;">*</span>{% endif %}
+                </div>
+
+                <div class="input-area">
+                    {{ field }}
+                </div>
+
+                {% if field.help_text %}
+                    <small style="color: #6c757d; font-style: italic; display: block; margin-top: 4px;">
+                        ℹ️ {{ field.help_text }}
+                    </small>
+                {% endif %}
+
+                {% if field.errors %}
+                    <div class="field-errors" style="margin-top: 5px;">
+                        {% for error in field.errors %}
+                            <div style="color: #dc3545; font-size: 0.9em;">
+                                ❌ {{ error }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div class="form-actions" style="text-align: center; margin-top: 30px;">
+            <button type="submit" style="background-color: #48111f; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                💾 Salvează Produsul
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -3,7 +3,7 @@ from .models import Accesare, Locatie, Prajitura
 from django.db.models import Count
 from django.http import HttpResponse
 from datetime import datetime
-from .forms import FiltrePrajituraForm, ContactForm
+from .forms import FiltrePrajituraForm, ContactForm, PrajituraForm
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django import forms
@@ -507,6 +507,26 @@ def detalii_categorie(request, cod_categorie):
     context['user_ip'] = get_ip(request)
     return render(request, 'Cofetarie/lista_produse.html', context)
 
+
+# Exemplu pentru views.py
+def adauga_produs(request):
+    if request.method == 'POST':
+        form = PrajituraForm(request.POST, request.FILES)
+        if form.is_valid():
+            prajitura = form.save(commit=False)
+            
+            cost = form.cleaned_data['cost_productie']
+            adaos = form.cleaned_data['adaos_comercial']
+            
+            prajitura.pret = cost + (cost * adaos / 100)
+            
+            prajitura.save()
+            form.save_m2m()#trebuie legate si campurile many to many
+            
+            return redirect('produse')
+    else:
+        form = PrajituraForm()
+    return render(request, 'Cofetarie/adauga_produs.html', {'form': form})
 
 
 

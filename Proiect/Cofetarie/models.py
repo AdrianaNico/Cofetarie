@@ -170,7 +170,7 @@ class Prajitura(models.Model):
         RED_VELVET = 'RV', 'Red Velvet'
         CHEESECAKE = 'CS', 'Cheesecake'
         CINNAMON_ROLLS = 'CR', 'Cinnamon Rolls'
-        NEGRESA = 'NG', 'Negresa'
+        TARTA = 'TR', 'Tarta'
         ECLER = 'EC', 'Ecler'
         ALTUL = 'AL', 'Altul'
     # icon
@@ -178,7 +178,7 @@ class Prajitura(models.Model):
         'RV': {'icon': 'fa-heart', 'color': '#A52A2A'},  # Red Velvet
         'CS': {'icon': 'fa-lemon', 'color': '#FFD700'},  # Cheesecake
         'CR': {'icon': 'fa-cogs', 'color': '#8B4513'},   # Cinnamon Rolls
-        'NG': {'icon': 'fa-square', 'color': '#4B0082'}, # Negresa
+        'TR': {'icon': 'fa-square', 'color': '#4B0082'}, # Tarta
         'EC': {'icon': 'fa-star', 'color': '#008000'},   # Ecler
         'AL': {'icon': 'fa-circle-question', 'color': '#808080'}, # Altul
     }
