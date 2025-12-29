@@ -1,0 +1,48 @@
+{% extends 'Cofetarie/baza.html' %}
+
+{% block content %}
+<div class="contact-container" style="max-width: 500px; margin: 40px auto; padding: 10px;">
+    
+    <header style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-size: 1.5rem; color: #48111f;">📝 Cont Nou</h2>
+    </header>
+
+    <div class="contact-form" style="background: #f9f9f9; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group" style="margin-bottom: 15px;">
+                    
+                    <label for="{{ field.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.errors %}
+                        <div class="error-msg" style="color: #d32f2f; font-size: 0.85em; margin-top: 3px;">
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                    
+                    {% if field.help_text %}
+                        <small style="color: #666; font-size: 0.8em; display: block; margin-top: 4px;">
+                            {{ field.help_text|safe }}
+                        </small>
+                    {% endif %}
+                    
+                </div>
+            {% endfor %}
+
+            <button type="submit" style="width: 100%; margin-top: 10px; padding: 10px; background-color: #48111f; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                Creează cont
+            </button>
+        </form>
+
+        <p style="margin-top: 15px; text-align: center; font-size: 0.9rem;">
+            Ai deja cont? <a href="{% url 'login' %}" style="color: #48111f; font-weight: bold;">Loghează-te</a>.
+        </p>
+    </div>
+</div>
+{% endblock %}

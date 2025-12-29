@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 from urllib.parse import urlparse, parse_qsl
+from django.contrib.auth.models import AbstractUser
 
 id_count=0
 class Accesare(models.Model):
@@ -88,7 +89,7 @@ class Optiuni_crema(models.Model):
 
 
 
-class Optinuni_decoratiune(models.Model):
+class Optiuni_decoratiune(models.Model):
     nume_decoratiune = models.CharField(max_length=100, unique=True)
     detalii = models.TextField(null=True, blank=True)
     pret = pret = models.DecimalField(max_digits=8, default=0.00, decimal_places=2)
@@ -228,4 +229,18 @@ class Prajitura(models.Model):
 #     def __str__(self):
 #         return self.nume_user + " " + self.prenume_user
     
+
+
+# model personalizat de utilizator
+class User(AbstractUser):
     
+    telefon = models.CharField(max_length=10, help_text="Format: 07xxxxxxxx")
+    adresa = models.CharField(max_length=100, verbose_name="Adresă Completă")
+    oras = models.CharField(max_length=50, verbose_name="Oraș")
+    data_nasterii = models.DateField(null=True, blank=True, help_text="Format: AAAA-LL-ZZ")
+    promotii = models.BooleanField(default=False, verbose_name="Vreau să primesc oferte pe email")
+    cod = models.CharField(max_length=100, null=True, blank=True)
+    email_confirmat = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.username

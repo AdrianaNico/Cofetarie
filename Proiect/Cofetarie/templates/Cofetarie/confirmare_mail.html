@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container { font-family: Arial, sans-serif; padding: 20px; text-align: center; border: 1px solid #ddd; }
+        .btn { background-color: #48111f; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .logo { max-width: 150px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://cdn-icons-png.flaticon.com/512/2821/2821785.png" alt="Logo Cofetarie" class="logo">
+        
+        <h2>Bun venit, {{ prenume }} {{ nume }}!</h2>
+        <p>Username: <strong>{{ username }}</strong></p>
+        
+        <p>Îți mulțumim că te-ai înregistrat pe site-ul nostru. Pentru a putea accesa contul, te rugăm să confirmi adresa de e-mail.</p>
+        
+        <br>
+        <a href="{{ link_confirmare }}" class="btn">Confirmă Email-ul</a>
+        <br><br>
+        
+        <p><small>Dacă butonul nu funcționează, accesează acest link:<br> {{ link_confirmare }}</small></p>
+    </div>
+</body>
+</html>

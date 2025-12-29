@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from .models import Accesare, Locatie, Prajitura
+from .models import Accesare, Locatie, Prajitura, User
 from django.db.models import Count
 from django.http import HttpResponse
 from datetime import datetime
-from .forms import FiltrePrajituraForm, ContactForm, PrajituraForm
+from .forms import FiltrePrajituraForm, ContactForm, PrajituraForm, InregistrareForm, LoginForm
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django import forms
@@ -11,9 +11,15 @@ import os #pentru operatii pe fisiere
 import json
 import time
 from django.conf import settings #pentru a obtine calea radacina a proiectului
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout
+import uuid
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 
-from .models import Tort, Optinuni_decoratiune, Optiuni_blat, Optiuni_crema, Prajitura
+from .models import Tort, Optiuni_decoratiune, Optiuni_blat, Optiuni_crema, Prajitura
 
 
 from django.core.mail import send_mail
@@ -529,7 +535,116 @@ def adauga_produs(request):
     return render(request, 'Cofetarie/adauga_produs.html', {'form': form})
 
 
+def inregistrare_view(request):
+    if request.method == 'POST':
+        form = InregistrareForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            
+            user.cod = str(uuid.uuid4())
+            user.email_confirmat = False
+            
+            user.save()
+            trimite_email_confirmare(user, request)
+            
+            # login(request, user) # Logăm utilizatorul direct după înregistrare
+            return redirect('login')
+    else:
+        form = InregistrareForm()
+    return render(request, 'Cofetarie/inregistrare.html', {'form': form})
 
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            
+            if not user.email_confirmat:
+                form.add_error(None, "Contul dumneavoastră nu este confirmat. Vă rugăm să verificați emailul pentru link-ul de confirmare.")
+                return render(request, 'Cofetarie/login.html', {'form': form})
+            login(request, user)
+            
+            request.session['nume_utilizator'] = user.last_name
+            request.session['prenume_utilizator'] = user.first_name
+            request.session['email_utilizator'] = user.email
+            request.session['telefon_utilizator'] = user.telefon
+            request.session['oras_utilizator'] = user.oras
+            
+            if form.cleaned_data.get('remember_me'):
+                request.session.set_expiry(24*60*60)
+            else:
+                request.session.set_expiry(0)
+                
+            return redirect('profil')
+    else:
+        form = LoginForm()
+    return render(request, 'Cofetarie/login.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+@login_required
+def profil_view(request):
+    context = {
+        'nume_sesiune': request.session.get('nume_utilizator', ''),
+        'prenume_sesiune': request.session.get('prenume_utilizator', ''),
+        'email_sesiune': request.session.get('email_utilizator', '-'),
+        'telefon_sesiune': request.session.get('telefon_utilizator', '-'),
+        'oras_sesiune': request.session.get('oras_utilizator', '-'),
+    }
+    context = get_context_categorii(context)
+    context['user_ip'] = get_ip(request)
+    
+    return render(request, 'Cofetarie/profil.html', context)
+
+
+
+
+def trimite_email_confirmare(user,request):
+    subiect = 'Confirmare email - Cofetaria NicoSweet'
+    link = request.build_absolute_uri(f"/Cofetarie/confirmare_email/{user.cod}/")
+    
+    context = {
+        'nume' : user.last_name,
+        'prenume' : user.first_name,
+        'username' : user.username,
+        'link_confirmare' : link,
+    }
+    
+    html_message = render_to_string('Cofetarie/confirmare_mail.html', context)
+    plain_message = strip_tags(html_message)
+    
+    send_mail(
+        subiect,
+        plain_message,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        html_message=html_message
+    )
+    
+
+def confirma_mail_view(request, cod):
+    try:
+        user = User.objects.get(cod=cod)
+        user.email_confirmat = True
+        user.cod = None
+        user.save()
+        
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        request.session['nume_utilizator'] = user.last_name
+        request.session['prenume_utilizator'] = user.first_name
+        request.session['email_utilizator'] = user.email
+        request.session['telefon_utilizator'] = user.telefon
+        request.session['oras_utilizator'] = user.oras
+        
+        messages.success(request, "✅ Adresa de email a fost confirmată cu succes! Acum vă puteți conecta.")
+    except User.DoesNotExist:
+        messages.error(request, "⛔ Codul de confirmare este invalid. Vă rugăm să verificați link-ul din email.")
+    return redirect('profil')
+
+    
 # from .forms import ContactForm
 
 # def contact_view(request):

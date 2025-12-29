@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'Cofetarie.middleware.Middleware',
 ]
 
+
 ROOT_URLCONF = 'Proiect.urls'
 
 TEMPLATES = [
@@ -94,25 +95,25 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # },
 ]
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ro'
 
 TIME_ZONE = 'UTC'
 
@@ -134,21 +135,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',
-# ]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 
-# AUTH_USER_MODEL = 'Cofetarie.CustomUser'
+AUTH_USER_MODEL = 'Cofetarie.User'
 
 # SETARI EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587 
 EMAIL_USE_TLS = True 
-EMAIL_HOST_USER = 'test.tweb.node@gmail.com' #
-EMAIL_HOST_PASSWORD = 'xdqswyrleddghrgm' #
+EMAIL_HOST_USER = 'django.adriana@gmail.com' #
+EMAIL_HOST_PASSWORD = 'klzoydfbjtdablej' #
 DEFAULT_FROM_EMAIL = 'Cofetaria NicoSweet <django.adriana@gmail.com>'
 
+LOGIN_URL = 'login' 
+LOGIN_REDIRECT_URL = 'profil'
 
 # debugg
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+

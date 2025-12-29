@@ -1,10 +1,11 @@
 from django import forms
-from .models import Prajitura, Ingrediente
+from .models import Prajitura, Ingrediente, User
 from datetime import date
 import re
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from django.utils import timezone
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 
 
 class FiltrePrajituraForm(forms.Form):
@@ -401,7 +402,7 @@ class PrajituraForm(forms.ModelForm):
     )
     
     descriere = forms.CharField(
-        label="Descriere",\
+        label="Descriere",
         widget=forms.Textarea,
         validators=[validate_uppercase_chars, validate_message_word_length],
         required=True
@@ -421,7 +422,7 @@ class PrajituraForm(forms.ModelForm):
     )
     class Meta:
         model = Prajitura
-        fields = ['nume_prajitura', 'categorie', 'gramaj', 'ingrediente', "nume_prajitura", "imagine"]
+        fields = ['nume_prajitura', 'categorie', 'gramaj', 'ingrediente', "imagine"]
         
         
     def clean_adaos_comercial(self):
@@ -462,3 +463,95 @@ class PrajituraForm(forms.ModelForm):
         
         return cleaned_data
         
+
+
+
+class InregistrareForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email', 'telefon', 'adresa', 'oras', 'data_nasterii', 'promotii']
+        
+        widgets = {
+            'data_nasterii': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+        
+        # labels = {
+        #     'first_name': 'Prenume',
+        #     'last_name': 'Nume',
+        #     'telefon': 'Număr de telefon',
+        #     'adresa': 'Adresă',
+        #     'oras': 'Oraș',
+        #     'data_nasterii': 'Data nașterii',
+        # }
+    
+    def clean_telefon(self):
+        telefon = self.cleaned_data.get('telefon')
+        if not telefon.isdigit():
+            raise ValidationError("Numărul de telefon trebuie să conțină doar cifre.")
+        if len(telefon) != 10:
+            raise ValidationError("Numărul de telefon trebuie să aibă exact 10 cifre.")
+        if not telefon.startswith('07'):
+            raise ValidationError("Numărul de telefon trebuie să înceapă cu '07'.")
+        return telefon
+
+    def clean_data_nasterii(self):
+        data_nasterii = self.cleaned_data.get('data_nasterii')
+        if data_nasterii:
+            azi = date.today()
+            varsta = azi.year - data_nasterii.year - ((azi.month, azi.day) < (data_nasterii.month, data_nasterii.day))
+            if varsta < 18:
+                raise ValidationError("Trebuie să aveți minim 18 ani pentru a vă înregistra.")
+        return data_nasterii
+
+    def clean_oras(self):
+        oras = self.cleaned_data.get('oras')
+        if oras and not oras[0].isupper():
+            raise ValidationError("Numele orașului trebuie să înceapă cu majusculă.")
+        return oras
+    
+    
+    def clean_password1(self):
+        parola = self.cleaned_data.get('password1')
+        
+        if parola:
+            if len(parola) < 8:
+                raise ValidationError("Parola nouă trebuie să aibă minim 8 caractere.")
+            if not re.search(r'[A-Z]', parola):
+                raise ValidationError("Parola nouă trebuie să conțină cel puțin o literă mare.")
+            if not re.search(r'[0-9]', parola):
+                raise ValidationError("Parola nouă trebuie să conțină cel puțin o cifră.")
+        return parola
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        for field in self.fields.values():
+            field.help_text = None
+        
+        self.fields['password1'].help_text = "Reguli: minim 8 caractere, o literă mare și o cifră."
+
+class LoginForm(AuthenticationForm):
+    remember_me = forms.BooleanField(
+        required=False,
+        label="Ține-mă minte logat pentru o zi",
+        widget=forms.CheckboxInput()
+    )
+    
+    
+class SchimbareParolaForm(PasswordChangeForm):
+    def clean_new_password1(self):
+        parola = self.cleaned_data.get('new_password1')
+        
+        if parola:
+            if len(parola) < 8:
+                raise ValidationError("Parola nouă trebuie să aibă minim 8 caractere.")
+            if not re.search(r'[A-Z]', parola):
+                raise ValidationError("Parola nouă trebuie să conțină cel puțin o literă mare.")
+            if not re.search(r'[0-9]', parola):
+                raise ValidationError("Parola nouă trebuie să conțină cel puțin o cifră.")
+        return parola
+
+    def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            
+            self.fields['new_password1'].help_text = "Reguli: minim 8 caractere, o literă mare și o cifră."

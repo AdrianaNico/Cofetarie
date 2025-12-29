@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -11,6 +12,8 @@
     <link rel="stylesheet" href="{% static 'Cofetarie/CSS/stil.css' %}">
 </head>
 <body>
+    
+    <div class="linie-sus"></div>
 
     <header>
         <h1>Cofetaria NicoSweet</h1>
@@ -53,8 +56,40 @@
                 
                 <li><a href="{% url 'log' %}">Log</a></li>
                 <li><a href="{% url 'info' %}">Info</a></li>
+
+                <li class="dropdown dreapta">
+                {% if user.is_authenticated %}
+                    <a href="#" class="dropbtn">
+                        <i class="fa-solid fa-user"></i> 
+                        {% if user.username %}
+                            {{ user.username }}
+                        {% else %}
+                            {{ user.first_name }}
+                        {% endif %}
+                    </a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'profil' %}">Profil</a>
+                        
+                        <form action="{% url 'logout' %}" method="post" style="margin:0;">
+                            {% csrf_token %}
+                            <button type="submit" class="logout-link">Ieșire cont</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <a href="#" class="dropbtn">
+                        <i class="fa-solid fa-user"></i> Cont
+                    </a>
+                    <div class="dropdown-content">
+                        <a href="{% url 'login' %}">Autentificare</a>
+                        <a href="{% url 'inregistrare' %}">Înregistrare</a>
+                    </div>
+                {% endif %}
+            </li>
             </ul>
         </nav>
+
+
+
     </header>
 
     <main>

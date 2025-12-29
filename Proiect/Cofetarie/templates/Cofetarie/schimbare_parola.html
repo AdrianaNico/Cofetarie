@@ -1,0 +1,47 @@
+{% extends 'Cofetarie/baza.html' %}
+
+{% block content %}
+<div class="contact-container" style="max-width: 500px; margin: 40px auto; padding: 10px;">
+    
+    <header style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-size: 1.5rem; color: #48111f;">🔑 Schimbare Parolă</h2>
+        <p style="color: #666; font-size: 0.9rem;">Introdu parola veche și cea nouă.</p>
+    </header>
+
+    <div class="contact-form" style="background: #f9f9f9; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="form-group" style="margin-bottom: 15px;">
+                    
+                    <label for="{{ field.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.errors %}
+                        <div class="error-msg" style="color: #d32f2f; font-size: 0.85em; margin-top: 3px;">
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                    
+                    {% if field.help_text %}
+                        <small style="color: #888; font-size: 0.75em; display: block; margin-top: 2px;">{{ field.help_text }}</small>
+                    {% endif %}
+                    
+                </div>
+            {% endfor %}
+
+            <button type="submit" style="width: 100%; margin-top: 10px; padding: 10px; background-color: #d4a017; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                Salvează noua parolă
+            </button>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="{% url 'profil' %}" style="color: #666; text-decoration: none; font-size: 0.9rem;">Renunță</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
