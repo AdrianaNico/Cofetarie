@@ -244,3 +244,37 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    
+
+class Vizualizare(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    produs = models.ForeignKey(Prajitura, on_delete=models.CASCADE)
+    data_vizualizare = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.produs.nume_prajitura}"
+
+
+class Promotie(models.Model):
+    nume = models.CharField(max_length=100)
+    data_creare = models.DateTimeField(auto_now_add=True)
+    data_expirare = models.DateTimeField()
+    subiect = models.CharField(max_length=255)
+    mesaj = models.TextField()
+    
+    reducere_procent = models.IntegerField(default=10, help_text="Procentul de reducere (ex: 15)")
+    cod_promotional = models.CharField(max_length=50, help_text="Ex: VARA2024")
+
+    categorii = models.TextField(help_text="Categoriile separate prin virgulă")
+
+    def __str__(self):
+        return self.nume
+    
+class LogareSuspecta(models.Model):
+    ip_address = models.GenericIPAddressField()
+    data_incercare = models.DateTimeField(auto_now_add=True)
+    username_incercat = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.ip_address} - {self.data_incercare}"

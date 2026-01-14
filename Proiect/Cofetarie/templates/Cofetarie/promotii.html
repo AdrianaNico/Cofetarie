@@ -1,0 +1,42 @@
+{% extends 'Cofetarie/baza.html' %}
+
+{% block content %}
+
+<div class="promotie-container">
+    <div class="promotie-card">
+        <div class="promotie-header">
+            <h2>Trimite Promoții Personalizate</h2>
+            <p>Promoțiile se vor trimite utilizatorilor care au vizualizat minim 3 produse din categoriile selectate.</p>
+        </div>
+
+        <form method="post" class="promotie-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label">{{ field.label }}</label>
+                
+                <div class="field-wrapper">
+                    {{ field }}
+                </div>
+                
+                {% if field.help_text %}
+                <small class="text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                
+                {% if field.errors %}
+                <div class="error-list">
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">Trimite Promoții</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

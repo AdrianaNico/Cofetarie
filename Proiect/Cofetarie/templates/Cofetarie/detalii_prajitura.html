@@ -1,39 +1,51 @@
 {% extends 'Cofetarie/baza.html' %}
 
 {% block content %}
-    <html lang="ro">
-    <head>
-        <meta charset="UTF-8">
-        <title>{{ titlu_pagina }}</title>
-    </head>
-    <body>
 
-        <h1>{{ prajitura.nume_prajitura }}</h1>
-        
-        <h2>Detalii Complete</h2>
-        
+
+
+    <h1 style="margin-top: 0;">{{ prajitura.nume_prajitura }}</h1>
+    
+    {% if prajitura.imagine %}
+        <div class="detalii-img-container" style="margin: 20px 0;">
+            <img src="{{ prajitura.imagine.url }}" alt="{{ prajitura.nume_prajitura }}" class="detalii-img-container">
+        </div>
+    {% else %}
+        <p>Imagine indisponibilă.</p>
+    {% endif %}
+
+    <h2>Detalii Complete</h2>
+    
+    <div class="descriere-prajitura">
         <p><strong>Descriere:</strong> {{ prajitura.descriere_prajitura|default:"Nu există descriere." }}</p>
-        {% if prajitura.imagine %}
-        <img src="{{ prajitura.imagine.url }}" alt="{{ prajitura.nume_prajitura }}" style="max-width: 400px;">
-            {% else %}
-                <p>Imagine indisponibilă.</p>
-            {% endif %}
-        <ul>
-            <li><strong>Categorie:</strong> {{ prajitura.get_categorie_display }}</li>
-            <li><strong>Preț:</strong> {{ prajitura.pret }} RON</li>
-            <li><strong>Gramaj:</strong> {{ prajitura.gramaj }} grame</li>
+    </div>
+
+    <ul class="detalii-lista" style="list-style-type: none; padding: 0; font-size: 1.1em;">
+        <li><strong>Categorie:</strong> {{ prajitura.get_categorie_display }}</li>
+        <li><strong>Preț:</strong> <span style="color: #d862b6; font-weight: bold;">{{ prajitura.pret }} RON</span></li>
+        <li><strong>Gramaj:</strong> {{ prajitura.gramaj }} grame</li>
+    </ul>
+
+    <h3>Ingrediente:</h3>
+    {% if prajitura.ingrediente.all %}
+        <ul style="margin-left: 20px;">
+            {% for ingredient in prajitura.ingrediente.all %}
+                <li>
+                    {{ ingredient.nume_ingredient }}
+                    {% if ingredient.este_alergen %} 
+                        <span style="color: red; font-weight: bold;">(alergen)❗</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
         </ul>
+    {% else %}
+        <p>Nu sunt specificate ingrediente.</p>
+    {% endif %}
 
-        <h3>Ingrediente:</h3>
-        {% if prajitura.ingrediente.all %}
-            <ul>
-                {% for ingredient in prajitura.ingrediente.all %}
-                    <li>{{ ingredient.nume_ingredient }}{% if ingredient.este_alergen %} (alergen)❗{% endif %}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>Nu sunt specificate ingrediente.</p>
-        {% endif %}
+    <br>
+    <a href="{% url 'produse' %}" class="filtru-buton" style="text-decoration: none; display: inline-block;">
+        ← Înapoi la produse
+    </a>
 
-    </body>
+
 {% endblock %}

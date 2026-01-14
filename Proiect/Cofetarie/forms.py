@@ -1,5 +1,5 @@
 from django import forms
-from .models import Prajitura, Ingrediente, User
+from .models import Prajitura, Ingrediente, User, Promotie
 from datetime import date
 import re
 from django.core.exceptions import ValidationError
@@ -49,10 +49,9 @@ class FiltrePrajituraForm(forms.Form):
         queryset=Ingrediente.objects.all().order_by('nume_ingredient'),
         required=False,
         label='Ingrediente',
-        widget=forms.SelectMultiple(attrs={
-            'class': 'ingrediente-select',
-            'size': '1', #dropdown in loc de lista
-            'style': 'width: 100%;'
+        # SCHIMBAREA ESTE AICI: Folosim CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple(attrs={
+            'class': 'lista-ingrediente-ascunsa' 
         }),
     )
     
@@ -521,7 +520,33 @@ class InregistrareForm(UserCreationForm):
             if not re.search(r'[0-9]', parola):
                 raise ValidationError("Parola nouă trebuie să conțină cel puțin o cifră.")
         return parola
+    
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        
+        if username and username.lower() == 'admin':
+            
+            email_incercat = self.data.get('email', 'Necunoscut')
+            
+            subiect = "cineva incearca sa ne preia site-ul"
+            mesaj_html = f"""
+            <p>Alerta de securitate maxima!</p>
+            <p>Cineva a incercat sa creeze un cont cu username-ul interzis <strong>admin</strong>.</p>
+            <p><strong>Adresa de e-mail folosita:</strong> {email_incercat}</p>
+            """
+            
+            try:
+                from Cofetarie.views import trimite_alerta_admin
+                trimite_alerta_admin(subiect, mesaj_html)
+            except ImportError:
+                pass 
 
+            raise forms.ValidationError("Acest username nu este permis.")
+            
+        return username
+    
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
@@ -555,3 +580,25 @@ class SchimbareParolaForm(PasswordChangeForm):
             super().__init__(*args, **kwargs)
             
             self.fields['new_password1'].help_text = "Reguli: minim 8 caractere, o literă mare și o cifră."
+            
+
+class PromotieForm(forms.ModelForm):
+    CATEGORII_CHOICES = Prajitura.CategoriePrajitura.choices 
+
+    categorii = forms.MultipleChoiceField(
+        choices=CATEGORII_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        label="Selectează categoriile pentru promoție"
+    )
+
+    class Meta:
+        model = Promotie
+        fields = ['nume', 'subiect', 'mesaj', 'data_expirare', 'reducere_procent', 'cod_promotional', 'categorii']
+        widgets = {
+            'data_expirare': forms.DateInput(attrs={'type': 'date'}),
+            'mesaj': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def clean_categorii(self):
+        data = self.cleaned_data['categorii']
+        return ",".join(data)

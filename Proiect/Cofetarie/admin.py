@@ -1,7 +1,7 @@
 # Register your models here.
 from django.contrib import admin
 # from .models import Organizator, Locatie
-from .models import Tort, Optiuni_decoratiune, Optiuni_blat, Optiuni_crema, Ingrediente, Prajitura, User
+from .models import Tort, Optiuni_decoratiune, Optiuni_blat, Optiuni_crema, Ingrediente, Prajitura, User, Vizualizare, Promotie, LogareSuspecta
 
 admin.site.site_header = "Panou de Administrare Site"
 admin.site.site_title = "Admin Site"
@@ -45,3 +45,6 @@ admin.site.register(Optiuni_decoratiune)
 admin.site.register(Ingrediente)
 admin.site.register(Prajitura)
 admin.site.register(User)
+admin.site.register(Vizualizare)
+admin.site.register(Promotie)
+admin.site.register(LogareSuspecta)

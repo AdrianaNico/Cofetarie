@@ -141,9 +141,14 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_USER_MODEL = 'Cofetarie.User'
 
+ADMINS = [
+    ('Adriana', 'django.adriana@gmail.com'),
+    ('AdminSecuritate', 'django.adriana@gmail.com'),
+]
+
 # SETARI EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.gmail.com' #simple mail transfer protocol
 EMAIL_PORT = 587 
 EMAIL_USE_TLS = True 
 EMAIL_HOST_USER = 'django.adriana@gmail.com' #

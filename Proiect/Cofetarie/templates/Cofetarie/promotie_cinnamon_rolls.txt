@@ -1,0 +1,16 @@
+=== COFETĂRIA NICOSWEET: OFERTĂ CINNAMON ROLLS ===
+
+Salutare!🍰
+
+Avem o veste dulce pentru tine legată de Cinnamon Rolls.
+
+----------------------------------------
+COD REDUCERE: {{ cod }}
+DISCOUNT: {{ procent }}%
+----------------------------------------
+
+* Valabil pentru: {{ categorie }}
+* Expiră la data: {{ data_expirare }}
+
+Te așteptăm cu drag!
+Echipa Cofetăria NicoSweet

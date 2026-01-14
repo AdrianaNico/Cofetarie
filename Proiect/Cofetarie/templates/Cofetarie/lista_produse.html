@@ -64,7 +64,17 @@
                     <div class="filtru-item">{{ form.pret_max.label_tag }}{{ form.pret_max }}</div>
                     <div class="filtru-item">{{ form.gramaj_min.label_tag }}{{ form.gramaj_min }}</div>
                     <div class="filtru-item">{{ form.gramaj_max.label_tag }}{{ form.gramaj_max }}</div>
-                    <div class="filtru-item">{{ form.ingrediente.label_tag }}{{ form.ingrediente }}</div>
+                    <div class="filtru-item">
+                        <label>Ingrediente:</label>
+                        
+                        <details class="custom-dropdown">
+                            <summary>Alege ingredientele...</summary>
+                            
+                            <div class="dropdown-content-checkboxes">
+                                {{ form.ingrediente }}
+                            </div>
+                        </details>
+                    </div>
                     <div class="filtru-item">{{ form.elemente_per_pagina.label_tag }}{{ form.elemente_per_pagina }}</div>
                 </div>
                 

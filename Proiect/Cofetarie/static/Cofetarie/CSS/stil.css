@@ -1,55 +1,96 @@
-h1{
-    color:rgb(209, 81, 147);
+/* =========================================
+1. STILURI GENERALE & RESETĂRI
+   ========================================= */
+
+.container-pagina {
+    padding: 10px 5px;
 }
-a{
-    color:rgb(78, 42, 132);
-    text-decoration: none;
+
+.descriere-prajitura {
+    line-height: 1.6;
+    max-width: 800px;
+    font-size: 1.1rem;
+    color: #444;
+    text-align: justify;
+    margin-bottom: 20px;
 }
-a:hover{
-    color:rgb(140, 101, 149);
+
+.detalii-lista li {
+    margin-bottom: 8px; /* Spațiu între liniile listei */
 }
 
 body {
     margin: 0;
     padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #fcfcfc;
 }
+
+h1 {
+    color: rgb(209, 81, 147);
+}
+
+a {
+    color: rgb(78, 42, 132);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: rgb(140, 101, 149);
+}
+
 .linie-sus {
-    height: 5px; /* Cât de groasă să fie linia (Stack Overflow are cam 3-4px) */
-    background-color: rgb(212, 102, 159); /* Movul tău elegant */
-    /* Sau poți pune magenta: background-color: magenta; */
+    height: 5px;
+    background-color: rgb(212, 102, 159);
     width: 100%;
 }
 
+.alert-success {
+    padding: 15px;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
 
+.error {
+    color: #d32f2f;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* =========================================
+2. MENIU PRINCIPAL
+   ========================================= */
 .meniu-principal {
     background-color: #f3f3f3;
     overflow: hidden;
-    font-family: Arial, sans-serif;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .meniu-principal ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    display: flex;       /* Activează modul Flexbox */
-    align-items: center; /* Aliniază toate butoanele perfect pe verticală */
-    width: 100%;         /* Se asigură că meniul ocupă tot ecranul */
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
-
-/* .meniu-principal li {
-    float: left;
-} */
-
-.meniu-principal li a, .dropbtn {
+.meniu-principal li a, 
+.dropbtn {
     display: inline-block;
     color: #d862b6;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
+    font-weight: 500;
 }
 
-.meniu-principal li a:hover, .dropdown:hover .dropbtn {
+.meniu-principal li a:hover, 
+.dropdown:hover .dropbtn {
     background-color: #ddd;
 }
 
@@ -63,7 +104,8 @@ body {
     background-color: #f9f9f9;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+    z-index: 100;
+    padding: 0;
 }
 
 .dropdown-content a {
@@ -82,6 +124,106 @@ body {
     display: block;
 }
 
+.meniu-principal li.dreapta {
+    margin-left: auto;
+}
+
+.meniu-principal li.dreapta .dropdown-content {
+    left: auto;
+    right: 0;
+}
+
+button.logout-link {
+    background: none;
+    border: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: Arial, sans-serif;
+}
+
+button.logout-link:hover {
+    background-color: #f1f1f1;
+}
+
+/* =========================================
+3. FORMULARE GENERALE (Contact, Login, etc)
+   ========================================= */
+.contact-form {
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form input[type="password"],
+.contact-form input[type="date"],
+.contact-form input[type="number"],
+.contact-form select,
+.contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus,
+.contact-form select:focus {
+    outline: none;
+    border-color: #d862b6;
+    box-shadow: 0 0 5px rgba(216, 98, 182, 0.3);
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.contact-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.contact-form button {
+    background-color: #48111f;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.contact-form button:hover {
+    background-color: #6a1a2e;
+}
+
+.form-group {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.form-grid {
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px;
+}
+/* =========================================
+4. FILTRE PRODUSE
+   ========================================= */
 .filtru-form {
     margin-bottom: 2rem;
     width: 100%; 
@@ -101,225 +243,343 @@ body {
     padding-bottom: 5px;
     border-bottom: 1px solid #f0f0f0;
     text-align: left;
+    font-weight: normal; 
 }
 
 .filtru-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 30px;
     justify-items: start;
     text-align: left;
+    align-items: start;
+}
+
+.filtru-item {
+    width: 100%;
 }
 
 .filtru-item label {
     color: rgb(160, 88, 160); 
-    font-weight: 500; 
-    margin-bottom: 4px;
-    font-size: 0.9rem;
+    font-weight: normal; 
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    display: block;
 }
 
 .filtru-item input,
-.filtru-item select {
+.filtru-item select:not([multiple]) {
     width: 100%;
     border: 1px solid #ccc; 
-    border-radius: 4px; 
-    padding: 6px;
+    border-radius: 6px; 
+    padding: 8px;
     background-color: white;
+    font-family: inherit;
 }
 
 .filtru-item input:focus,
 .filtru-item select:focus {
-    /* Focusul rămâne în culori vii */
     outline: none;
     border-color: magenta; 
-    box-shadow: 0 0 4px rgba(255, 0, 255, 0.4);
+    box-shadow: 0 0 0 3px rgba(255, 0, 255, 0.1);
 }
 
 .filtru-buton {
     background: rgb(172, 126, 172); 
-    border: 1px solid #cc00cc;
+    border: none;
     color: white;
-    padding: 8px 20px;
-    border-radius: 4px;
+    padding: 10px 25px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: normal; /* Fără bold */
     margin-top: 15px;
+    font-size: 1rem;
+    transition: background 0.2s;
 }
 
 .filtru-buton:hover {
-    background:rgb(204, 148, 204);
-    box-shadow: 0 2px 5px rgba(200, 0, 200, 0.3);
+    background: rgb(204, 148, 204);
 }
 
-/* Styling pentru dropdown ingrediente */
+
 .ingrediente-select {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     font-size: 14px;
     background-color: white;
-    cursor: pointer;
+    
+    height: auto; 
+    min-height: 180px; 
+    overflow-y: auto;
+    
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 .ingrediente-select:focus {
     outline: none;
-    border-color: #48111f;
-    box-shadow: 0 0 5px rgba(72, 17, 31, 0.3);
-}
-
-/* Opțiunile selectate */
-.ingrediente-select option:checked {
-    background-color: #ecdaed;
-    color: #48111f;
-    font-weight: bold;
+    border-color: rgb(209, 81, 147);
+    box-shadow: 0 0 0 3px rgba(209, 81, 147, 0.1);
 }
 
 .ingrediente-select option {
-    padding: 8px;
-}
-
-
-
-.alert-success {
-    padding: 15px;
-    background-color: #d4edda; 
-    color: #155724; 
-    border: 1px solid #c3e6cb; 
-    border-radius: 4px; 
-    margin-bottom: 20px;
-}
-
-.contact-form input[type="text"],
-.contact-form input[type="email"],
-.contact-form input[type="date"],
-.contact-form input[type="number"],
-.contact-form select,
-.contact-form textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
+    padding: 8px 12px;
+    margin-bottom: 2px;
     border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
+    color: #444;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
-.contact-form textarea {
-    resize: vertical;
-    min-height: 120px;
+.ingrediente-select option:hover {
+    background-color: #fcecf6;
 }
 
-.contact-form label {
+.ingrediente-select option:checked {
+    background-color: #f3d0e5 !important; 
+    color: #48111f;
+    font-weight: normal; 
+    border-left: 3px solid rgb(209, 81, 147); 
+}
+
+/* =========================================
+5. STILURI PAGINA PROMOȚII
+   ========================================= */
+.promotie-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.promotie-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+}
+
+.promotie-header {
+    background-color: #fcecf6;
+    padding: 30px;
+    text-align: center;
+    border-bottom: 2px solid #f3d0e5;
+}
+
+.promotie-header h2 {
+    color: rgb(209, 81, 147);
+    margin: 0 0 10px 0;
+}
+
+.promotie-header p {
+    color: #666;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.promotie-form {
+    padding: 30px;
+}
+
+.promotie-form .form-label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    color: rgb(160, 88, 160);
     font-weight: bold;
-    color: #333;
 }
 
-.contact-form button:hover {
-    background-color: #6a1a2e;
+.promotie-form input[type="text"],
+.promotie-form input[type="number"],
+.promotie-form input[type="date"],
+.promotie-form textarea,
+.promotie-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
 }
 
-.error {
-    color: #d32f2f;
-    font-size: 0.9em;
+.promotie-form input:focus,
+.promotie-form textarea:focus {
+    border-color: rgb(209, 81, 147);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(209, 81, 147, 0.1);
+}
+
+.promotie-form ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.promotie-form ul li label {
+    display: flex;
+    align-items: center;
+    background-color: #fdfdfd;
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: normal;
+    color: #444;
+}
+
+.promotie-form ul li label:hover {
+    background-color: #fcecf6;
+    border-color: #f3d0e5;
+}
+
+.promotie-form ul li input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.text-muted {
+    display: block;
+    color: #888;
+    font-size: 0.85rem;
     margin-top: 5px;
 }
 
-.contact-form {
-    background: #f9f9f9;
-    padding: 30px;
-    border-radius: 8px;
-}
-
-.form-group {
-    margin-top: 20px;
-}
-
-.form-grid {
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 20px;
-}
-
-/* contact */
-    .contact-form input[type="text"],
-    .contact-form input[type="email"],
-    .contact-form input[type="date"],
-    .contact-form input[type="number"],
-    .contact-form select,
-    .contact-form textarea {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-
-    .contact-form textarea {
-        resize: vertical;
-        min-height: 120px;
-    }
-
-    .contact-form label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    .contact-form button:hover {
-        background-color: #6a1a2e;
-    }
-
-
-
-    /* Trimite ultimul element în dreapta */
-.meniu-principal li.dreapta {
-    /* float: right; */
-    margin-left: auto;
-}
-
-.meniu-principal li.dreapta .dropdown-content {
-    left: auto;  /* Anulează alinierea la stânga standard */
-    right: 0;    /* Îl lipește de marginea dreaptă a butonului */
-}
-
-/* Face butonul de Logout să arate ca un text normal în meniu */
-button.logout-link {
-    background: none;
+.btn-submit {
+    display: block;
+    width: 100%;
+    background: linear-gradient(45deg, rgb(209, 81, 147), rgb(160, 88, 160));
+    color: white;
+    padding: 15px;
     border: none;
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-    width: 100%;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: bold;
     cursor: pointer;
-    font-size: 1rem;
-    font-family: Arial, sans-serif;
+    margin-top: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-button.logout-link:hover {
-    background-color: #f1f1f1;
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(209, 81, 147, 0.3);
 }
 
-.contact-form input[type="password"] {
+/* =========================================
+DROPDOWN CUSTOM CU CHECKBOX-URI
+   ========================================= */
+
+/* 1. Cutia principală (Butonul pe care dai click) */
+.custom-dropdown {
+    position: relative; /* Esențial pentru poziționare */
     width: 100%;
-    padding: 8px;
+}
+
+.custom-dropdown summary {
+    list-style: none; /* Ascunde săgeata standard urâtă */
+    padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 14px;
+    color: #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.dropdown-content {
-    padding: 0; 
+/* Adăugăm o săgeată mică custom */
+.custom-dropdown summary::after {
+    content: '▼';
+    font-size: 0.8em;
+    color: rgb(209, 81, 147);
+    transition: transform 0.2s;
 }
 
-/* .dropdown-content a {
-    display: block;
+/* Când e deschis, săgeata se rotește */
+.custom-dropdown[open] summary::after {
+    transform: rotate(180deg);
+}
+
+/* 2. Lista care apare (Plutitoare) */
+.dropdown-content-checkboxes {
+    position: absolute; /* O face să plutească peste restul paginii */
+    top: 100%; /* Imediat sub buton */
+    left: 0;
     width: 100%;
+    max-height: 250px; /* Înălțimea maximă a listei */
+    overflow-y: auto;  /* Scroll dacă sunt multe */
+    background: white;
+    border: 1px solid #d862b6;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    z-index: 1000; /* Să fie deasupra tuturor elementelor */
+    padding: 10px;
     box-sizing: border-box;
-    align-items: left;
-} */
+}
+
+/* 3. Stilizarea listei generate de Django */
+.dropdown-content-checkboxes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-content-checkboxes li {
+    margin-bottom: 8px;
+}
+
+/* Stilizarea etichetei (Label) pentru fiecare checkbox */
+.dropdown-content-checkboxes label {
+    display: flex; /* Aliniază checkbox-ul cu textul */
+    align-items: center;
+    cursor: pointer;
+    font-weight: normal; /* Fără bold */
+    color: #333;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.1s;
+}
+
+.dropdown-content-checkboxes label:hover {
+    background-color: #fcecf6;
+}
+
+/* Checkbox-ul în sine */
+.dropdown-content-checkboxes input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+    accent-color: rgb(209, 81, 147); /* Culoarea bifei (Merge în Chrome/Edge/Firefox modern) */
+    cursor: pointer;
+}
+
+/* =========================================
+STILIZARE IMAGINI (Uniformizare)
+   ========================================= */
+
+.produs-imagine img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eee; 
+}
+
+.detalii-img-container img {
+    width: 100%;
+    max-width: 500px;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,1);
+    display: block; 
+    margin-bottom: 20px;
+}

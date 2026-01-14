@@ -27,6 +27,7 @@ urlpatterns = [
     path('profil/', views.profil_view, name='profil'),
     path('adauga_produs/', views.adauga_produs, name='adauga_produs'),
     path('confirmare_email/<str:cod>/', views.confirma_mail_view, name='confirma_mail'),
+    path('promotii/', views.promotii_view, name='promotii'),
     
     path('schimbare-parola/', auth_views.PasswordChangeView.as_view(
         template_name='Cofetarie/schimbare_parola.html', 

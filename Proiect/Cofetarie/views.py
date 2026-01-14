@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
-from .models import Accesare, Locatie, Prajitura, User
+from .models import Accesare, Locatie, LogareSuspecta, Prajitura, User, Vizualizare, Promotie
 from django.db.models import Count
 from django.http import HttpResponse
 from datetime import datetime
-from .forms import FiltrePrajituraForm, ContactForm, PrajituraForm, InregistrareForm, LoginForm
+from .forms import FiltrePrajituraForm, ContactForm, PrajituraForm, InregistrareForm, LoginForm, PromotieForm
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django import forms
@@ -14,9 +14,12 @@ from django.conf import settings #pentru a obtine calea radacina a proiectului
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout
 import uuid
-from django.core.mail import send_mail
+from django.core.mail import send_mail, send_mass_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.contrib.auth.decorators import user_passes_test # sau login_required
+from django.utils import timezone
+from datetime import timedelta
 
 
 from .models import Tort, Optiuni_decoratiune, Optiuni_blat, Optiuni_crema, Prajitura
@@ -33,6 +36,25 @@ from django.core.mail import send_mail
 #         recipient_list=['test.tweb.node@gmail.com'],
 #         fail_silently=False,
 #     )
+
+from django.core.mail import mail_admins
+from django.utils.html import strip_tags
+
+def trimite_alerta_admin(subiect, mesaj_continut_html):
+
+    html_message = f"""
+    <h1 style="color: red;">{subiect}</h1>
+    <hr>
+    {mesaj_continut_html}
+    """
+    
+    plain_message = strip_tags(html_message)
+    
+    mail_admins(
+        subject=subiect,
+        message=plain_message,
+        html_message=html_message
+    )
 
 def get_ip(request):
     return request.META.get('REMOTE_ADDR')
@@ -429,6 +451,25 @@ def detalii_prajitura(request, id_prajitura):
     except Prajitura.DoesNotExist:
         messages.error(request, f"Ne pare rău, prăjitura {id_prajitura} nu există.")
         return redirect('produse')
+    
+    
+    if request.user.is_authenticated:
+        N = 5
+
+        Vizualizare.objects.create(
+            user=request.user,
+            produs=prajitura
+        )
+        
+        istoric_vizualizari = Vizualizare.objects.filter(user=request.user).order_by('data_vizualizare')
+        count = istoric_vizualizari.count()
+        
+        if count > N:
+            numar_de_sters = count - N
+            id_uri_de_sters = istoric_vizualizari.values_list('id', flat=True)[:numar_de_sters]
+            Vizualizare.objects.filter(id__in=id_uri_de_sters).delete()
+
+    
     context ={
         'prajitura': prajitura,
         'titlu_pagina': f"Detalii {prajitura.nume_prajitura}",
@@ -554,17 +595,33 @@ def inregistrare_view(request):
     return render(request, 'Cofetarie/inregistrare.html', {'form': form})
 
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 def login_view(request):
+    
+    if request.user.is_authenticated:
+        return redirect('profil')
+    
     if request.method == 'POST':
         form = LoginForm(data=request.POST)
+        
         if form.is_valid():
             user = form.get_user()
             
             if not user.email_confirmat:
                 form.add_error(None, "Contul dumneavoastră nu este confirmat. Vă rugăm să verificați emailul pentru link-ul de confirmare.")
                 return render(request, 'Cofetarie/login.html', {'form': form})
+            
             login(request, user)
             
+            # Setare sesiune
             request.session['nume_utilizator'] = user.last_name
             request.session['prenume_utilizator'] = user.first_name
             request.session['email_utilizator'] = user.email
@@ -577,8 +634,42 @@ def login_view(request):
                 request.session.set_expiry(0)
                 
             return redirect('profil')
+            
+        else:
+            
+            username_primit = request.POST.get('username', 'Necunoscut')
+            ip_client = get_client_ip(request)
+            
+            LogareSuspecta.objects.create(
+                ip_address=ip_client,
+                username_incercat=username_primit
+            )
+            
+            timp_limita = timezone.now() - timedelta(minutes=2)
+            
+            numar_incercari = LogareSuspecta.objects.filter(
+                ip_address=ip_client,
+                data_incercare__gte=timp_limita
+            ).count()
+            
+            if numar_incercari >= 3:
+                subiect = "Logari suspecte"
+                
+                mesaj_html = f"""
+                <p>Au fost detectate <strong>{numar_incercari}</strong> incercari esuate de logare in ultimele 2 minute.</p>
+                <ul>
+                    <li><strong>Username folosit:</strong> {username_primit}</li>
+                    <li><strong>IP Atacator:</strong> {ip_client}</li>
+                    <li><strong>Data și ora:</strong> {timezone.now()}</li>
+                </ul>
+                <p>Vă rugăm să investigați.</p>
+                """
+                
+                trimite_alerta_admin(subiect, mesaj_html)
+
     else:
         form = LoginForm()
+        
     return render(request, 'Cofetarie/login.html', {'form': form})
 
 def logout_view(request):
@@ -626,24 +717,117 @@ def trimite_email_confirmare(user,request):
     
 
 def confirma_mail_view(request, cod):
+    if request.user.is_authenticated:
+        return redirect('profil')
+
     try:
         user = User.objects.get(cod=cod)
+        
         user.email_confirmat = True
-        user.cod = None
+        user.cod = None 
         user.save()
         
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        
         request.session['nume_utilizator'] = user.last_name
         request.session['prenume_utilizator'] = user.first_name
         request.session['email_utilizator'] = user.email
         request.session['telefon_utilizator'] = user.telefon
         request.session['oras_utilizator'] = user.oras
         
-        messages.success(request, "✅ Adresa de email a fost confirmată cu succes! Acum vă puteți conecta.")
-    except User.DoesNotExist:
-        messages.error(request, "⛔ Codul de confirmare este invalid. Vă rugăm să verificați link-ul din email.")
-    return redirect('profil')
+        messages.success(request, "✅ Email confirmat cu succes! Te-am autentificat automat.")
+        return redirect('profil')
 
+    except User.DoesNotExist:
+        messages.error(request, "⛔ Codul de confirmare este invalid sau a expirat.")
+        return redirect('login')
+    
+    
+    
+@user_passes_test(lambda u: u.is_staff)
+def promotii_view(request):
+    if request.method == 'POST':
+        form = PromotieForm(request.POST)
+        if form.is_valid():
+            promotie = form.save()
+            
+            try:
+                categorii_selectate = form.cleaned_data['categorii'].split(',')
+                
+                data_expirare = promotie.data_expirare.strftime("%d-%m-%Y")
+                subiect = promotie.subiect
+                cod = promotie.cod_promotional
+                procent = promotie.reducere_procent
+                
+                K = 3
+                mesaje_de_trimis = []
+                
+                for categorie in categorii_selectate:
+                    template_name = 'Cofetarie/promotie_standard.txt'
+                    if categorie == 'EC': 
+                        template_name = 'Cofetarie/promotie_ecler.txt'
+                    elif categorie == 'CR':
+                        template_name = 'Cofetarie/promotie_cinnamon_rolls.txt'
+                    
+                    users_target = User.objects.filter(
+                        vizualizare__produs__categorie=categorie
+                    ).annotate(
+                        nr_vizualizari=Count('vizualizare')
+                    ).filter(
+                        nr_vizualizari__gte=K
+                    ).distinct()
+                    
+                    context_email = {
+                        'subiect': subiect,
+                        'data_expirare': data_expirare,
+                        'cod': cod,
+                        'procent': procent,
+                        'categorie': categorie
+                    }
+                    
+                    mesaj_text = render_to_string(template_name, context_email)
+                    
+                    for user in users_target:
+                        if user.email: 
+                            mesaj_tuple = (
+                                f"Promoție Nouă: {subiect}",
+                                mesaj_text,
+                                settings.DEFAULT_FROM_EMAIL,
+                                [user.email]
+                            )
+                            mesaje_de_trimis.append(mesaj_tuple)
+                
+
+                if mesaje_de_trimis:
+                    send_mass_mail(tuple(mesaje_de_trimis), fail_silently=False)
+                    messages.success(request, f"Au fost trimise {len(mesaje_de_trimis)} email-uri!")
+                else:
+                    messages.warning(request, "Niciun utilizator nu a îndeplinit condițiile de vizualizare (K>=3).")
+
+            except Exception as e:
+                
+                subiect_err = "Eroare critica in aplicatie"
+                
+                mesaj_html = f"""
+                <p>A aparut o eroare in timpul procesarii promotiilor.</p>
+                <div style="background-color: red; color: white; padding: 15px; border-radius: 5px;">
+                    <strong>Detalii Eroare:</strong><br>
+                    {str(e)}
+                </div>
+                """
+                
+                trimite_alerta_admin(subiect_err, mesaj_html)
+                
+                messages.error(request, "A apărut o eroare internă. Administratorii au fost notificați.")
+                        
+            return redirect('promotii')
+            
+    else:
+        form = PromotieForm()
+        all_cats = [c[0] for c in Prajitura.CategoriePrajitura.choices]
+        form.initial['categorii'] = all_cats
+
+    return render(request, 'Cofetarie/promotii.html', {'form': form})
     
 # from .forms import ContactForm
 
