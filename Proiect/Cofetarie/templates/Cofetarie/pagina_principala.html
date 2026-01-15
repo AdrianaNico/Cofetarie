@@ -4,31 +4,154 @@
 {% block title %}Acasă - Cofetaria NicoSweet{% endblock %}
 
 {% block content %}
-    <section id="bun-venit">
-        <h2>Bun venit la Cofetaria NicoSweet!</h2>
-        <p>Locul unde deserturile prind viață.</p>
+<style>
+    .container-acasa {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+
+.header-box {
+    background-color: #f8daef;
+    color: #5c3a21;
+    padding: 40px;
+    border-radius: 20px; 
+    margin-bottom: 50px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+}
+
+.header-box h1 {
+    color: #d63384;
+    margin-top: 0;
+    font-size: 2.5rem;
+}
+
+.cards-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-bottom: 50px;
+}
+
+.card-interactiv {
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 25px;
+    width: 260px;
+    background-color: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    text-decoration: none; 
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-interactiv:hover {
+    transform: translateY(-10px); 
+    box-shadow: 0 15px 30px rgba(214, 51, 132, 0.2);
+    border-color: #ffb6c1;
+}
+
+.card-interactiv h3 {
+    color: #5c3a21;
+    margin: 15px 0 10px 0;
+}
+
+.card-icon {
+    font-size: 40px;
+    background-color: #fff0f6;
+    padding: 15px;
+    border-radius: 50%; 
+    margin-bottom: 10px;
+    transition: transform 0.3s;
+}
+
+.card-interactiv:hover .card-icon {
+    transform: scale(1.1) rotate(10deg);/
+}
+
+.link-text {
+    color: #d63384;
+    font-weight: bold;
+    margin-top: auto; 
+}
+
+.promo-box {
+    background: linear-gradient(135deg, #fff0f6 0%, #fff 100%);
+    border: 2px dashed #d63384;
+    padding: 30px;
+    border-radius: 15px;
+    margin-top: 40px;
+}
+
+.btn-mare {
+    background-color: #d63384;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+.btn-mare:hover {
+    background-color: #a82465; 
+    box-shadow: 0 5px 15px rgba(214, 51, 132, 0.4);
+}
+</style>
+
+
+
+
+<div class="container-acasa">
+
+    <div class="header-box">
+        <h1>Bun venit la NicoSweet! 🍰</h1>
+        <p style="font-size: 1.2rem;">
+            Locul unde deserturile prind viață. 
+            Folosim doar ingrediente naturale și multă pasiune.
+        </p>
+        <a href="{% url 'produse' %}" class="btn-mare">Vezi Meniul Complet</a>
+    </div>
+
+    <div class="cards-row">
         
-        <img src="{% static 'Cofetarie/imagini/prajitura_casei.jpg' %}" alt="Prajitura casei" style="width:300px;">
-    </section>
+        <a href="{% url 'produse' %}" class="card-interactiv">
+            <div class="card-icon">🧁</div>
+            <h3>Noutăți</h3>
+            <p>Vezi ce am scos proaspăt din cuptor.</p>
+            <span class="link-text">Vezi detalii &rarr;</span>
+        </a>
 
-    <section id="noutati">
-        <h2>Noutăți</h2>
-        <p>Cele mai noi deserturi.</p>
-    </section>
-    
-    <section id="recomandari">
-        <h2>Recomandări</h2>
-        <p>Încearcă faimoasa tartă de ciocolată!</p>
-    </section>
+        <a href="{% url 'detalii_prajitura' 9 %}" class="card-interactiv">
+            <div class="card-icon">⭐</div>
+            <h3>Recomandare</h3>
+            <p>Încearcă <strong>Tarta de Ciocolată</strong>.</p>
+            <span class="link-text">Comandă acum &rarr;</span>
+        </a>
 
-    <section id="evenimente">
-        <h2>Evenimente Speciale</h2>
-        <p>Organizăm candy-bar pentru nunți și botezuri.</p>
-    </section>
+        <a href="{% url 'contact' %}" class="card-interactiv">
+            <div class="card-icon">🎉</div>
+            <h3>Evenimente</h3>
+            <p>Candy Bar pentru nunți și botezuri.</p>
+            <span class="link-text">Cere ofertă &rarr;</span>
+        </a>
 
-    <section id="promotii">
-        <h2>Promoția Săptămânii</h2>
-        <p>La orice tort comandat, primești o cutie de macarons gratuit!</p>
-    </section>
+    </div>
+
+    <div class="promo-box">
+        <h3 style="color: #d63384; margin: 0;">🎁 Promoția Săptămânii</h3>
+        <p>La orice tort comandat, primești o cutie de <strong>Macarons gratuit!</strong></p>
+    </div>
+
+</div>
 
 {% endblock %}
